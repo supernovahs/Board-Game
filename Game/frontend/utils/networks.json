@@ -1,0 +1,10 @@
+{
+  "selectedChain": "69",
+  "69": {
+    "chainId": "69",
+    "networkName": "KovanOptimism",
+    "rpc": ["https://kovan.optimism.io"],
+    "nativeCurrency": "ETH",
+    "blockExplorer": ["https://kovan-optimistic.etherscan.io"]
+  }
+}

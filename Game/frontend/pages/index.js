@@ -2,15 +2,12 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useState } from "react";
-import { groth16 } from 'snarkjs';
+import Entergame from "../components/Entergame";
 const ethers = require("ethers");
+const groth16 = require("snarkjs").groth16;
 
 export default function Home() {
   const [salt, setsalt] = useState();
-
-
-
-
 
   return (
     <div className={styles.container}>
@@ -23,7 +20,8 @@ export default function Home() {
       <main className={styles.main}>
 
         <div style={{ width: 50 }} >
-          <button
+          <Entergame />
+          {/* <button
             className={styles.button}
             onClick={async () => {
               console.log("click")
@@ -43,12 +41,18 @@ export default function Home() {
 
 
 
+
+
+
+
+
+
             }}
 
 
           >
             Click
-          </button>
+          </button> */}
 
         </div>
 

@@ -78,5 +78,6 @@ template RangeProof () {
 
 }
 
-component main = RangeProof();
+
+component main { public [zone]} = RangeProof();
 

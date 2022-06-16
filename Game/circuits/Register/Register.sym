@@ -1,8 +1,8 @@
 1,1,10,main.c
-2,2,10,main.a
-3,3,10,main.b
-4,4,10,main.salt
-5,5,10,main.zone
+2,2,10,main.zone
+3,3,10,main.a
+4,4,10,main.b
+5,5,10,main.salt
 6,-1,10,main.xleftside
 7,-1,10,main.xrightside
 8,-1,9,main.checkxleft.out

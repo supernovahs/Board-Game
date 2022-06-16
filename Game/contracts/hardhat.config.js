@@ -30,5 +30,9 @@ module.exports = {
       url: "https://kovan.optimism.io",
       accounts: [process.env.PRIVATE_KEY],
     },
+    ropsten: {
+      url: "https://ropsten.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb",
+      accounts: [process.env.PRIVATE_KEY],
+    },
   },
 };

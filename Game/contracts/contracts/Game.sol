@@ -9,7 +9,7 @@ interface Iverifier{
             uint[2] memory a,
             uint[2][2] memory b,
             uint[2] memory c,
-            uint[1] memory input
+            uint[2] memory input
         ) external view returns (bool);
 }
 
@@ -19,6 +19,7 @@ abstract contract LoogiesContract {
 }
 
 contract Footsteps {
+  mapping(address =>uint) public  bal;
 
   LoogiesContract public loogiescontract;
   address public verifier;
@@ -36,7 +37,9 @@ contract Footsteps {
 
   struct Player{
     address player;
-    uint health;    
+    uint health;
+    uint location;
+    uint zone;
   }
 
   Player[] public players;
@@ -53,16 +56,22 @@ contract Footsteps {
 
 **/
 
-  function Register(uint LoogieId,uint[2] memory a,uint[2][2] memory b,uint[2] memory c,uint[1] memory input) external {
+  function Register(uint LoogieId,uint[2] memory a,uint[2][2] memory b,uint[2] memory c,uint[2] memory input) external {
     if(Iverifier(verifier).verifyProof(a,b,c,input) != true) revert InvalidProof();
     if(loogies[msg.sender] !=0 ) revert AlreadyRegistered(msg.sender);
 
     Player memory  player = Player({
       player: msg.sender,
-      health: 100
+      health: 100,
+      location: input[0],
+      zone: input[1]
     });
 
     players.push(player);
     loogies[msg.sender] = LoogieId;
+  }
+
+  function getpayment() external payable {
+    bal[msg.sender] += msg.value;
   }
 }

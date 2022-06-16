@@ -1,10 +1,17 @@
 {
-  "selectedChain": "69",
+  "selectedChain": "3",
   "69": {
     "chainId": "69",
     "networkName": "KovanOptimism",
     "rpc": ["https://kovan.optimism.io"],
     "nativeCurrency": "ETH",
     "blockExplorer": ["https://kovan-optimistic.etherscan.io"]
+  },
+  "3": {
+    "chainId": "3",
+    "networkName": "ropsten",
+    "rpc": ["https://ropsten.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb"],
+    "nativeCurrency": "ETH",
+    "blockExplorer": ["https://ropsten.etherscan.io"]
   }
 }

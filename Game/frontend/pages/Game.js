@@ -31,8 +31,6 @@ export default function Game() {
         signerOrProvider: provider
     })
 
-
-
     const [xcoordinate, setXcoordinate] = useState(0);
     const [ycoordinate, setYcoordinate] = useState(0);
 
@@ -40,23 +38,17 @@ export default function Game() {
         const random = ethers.BigNumber.from(ethers.utils.randomBytes(32)).toString();
         const res = await gameproof(xcoordinate, ycoordinate, 1, random);
         console.log("res", res);
-        console.log("res0", res[0].length);
-        console.log(res[1]);
-        console.log("contract", gamecontractwrite);
-        let result = await gamecontractwrite.Register(1, res[0], res[1], res[2], res[3], { gasLimit: 1000000 });
-        // let result = await gamecontractwrite.getpayment({ value: 10000000000, gasLimit: 1000000 });
-        console.log("result", result);
-        // console.log("Result", result);
-        // try {
-        //     let result;
-        //     if (account.data?.address && data.chain.id.toString() === networks.selectedChain) {
-        //         result = await gamecontractwrite.Register(1, res[0], res[1], res[2], res[4]);
-        //     }
+        console.log("res1", res[1]);
+        console.log(res[0].length, res[1].length, res[2].length, res[3].length);
+        console.log("res1", [res[1][0][0], res[1][0][1], res[1][1][0], res[1][1][1]]);
 
-        // }
-        // catch (err) {
-        //     console.log(err);
-        // }
+        let a = Array.from(Array(2), () => new Array(2));
+        a[0][0] = res[1][0][0];
+        a[0][1] = res[1][0][1];
+        a[1][0] = res[1][1][0];
+        a[1][1] = res[1][1][1];
+        console.log("a", a);
+        let result = await gamecontractwrite.Register(10, res[0], res[1], res[2], res[3], { gasLimit: 2000000 });
     }
 
     return (

@@ -6,7 +6,7 @@ const deploy = async () => {
     const verifier = await registerverifier.deploy();
     await verifier.deployed();
 
-    console.log("Sudoko Verifier deployed to", verifier.address);
+    console.log(" Verifier deployed to", verifier.address);
 
     const game = await hre.ethers.getContractFactory("Footsteps");
     const gameInstance = await game.deploy(verifier.address);

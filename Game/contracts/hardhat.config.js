@@ -34,5 +34,9 @@ module.exports = {
       url: "https://ropsten.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb",
       accounts: [process.env.PRIVATE_KEY],
     },
+    kovan: {
+      url: "https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb",
+      accounts: [process.env.PRIVATE_KEY],
+    }
   },
 };

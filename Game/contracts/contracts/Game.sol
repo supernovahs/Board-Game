@@ -1,8 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
-
 // @notice: Interface of Verifying contract
 interface Iverifier{
     function verifyProof(
@@ -53,12 +51,10 @@ contract Footsteps {
   
 /* @notice: Register a player
 
-
 **/
 
   function Register(uint LoogieId,uint[2] memory a,uint[2][2] memory b,uint[2] memory c,uint[2] memory input) external {
-    if(Iverifier(verifier).verifyProof(a,b,c,input) != true) revert InvalidProof();
-    if(loogies[msg.sender] !=0 ) revert AlreadyRegistered(msg.sender);
+    require(Iverifier(verifier).verifyProof(a,b,c,input) == true,"Invalid input");
 
     Player memory  player = Player({
       player: msg.sender,
@@ -75,3 +71,4 @@ contract Footsteps {
     bal[msg.sender] += msg.value;
   }
 }
+

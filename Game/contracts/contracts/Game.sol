@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 // @notice: Interface of Verifying contract
-interface Iverifier{
+interface Registerverifier{
     function verifyProof(
             uint[2] memory a,
             uint[2][2] memory b,
@@ -11,19 +11,51 @@ interface Iverifier{
         ) external view returns (bool);
 }
 
+interface Moveverifier{
+  function verifyProof(
+            uint[2] memory a,
+            uint[2][2] memory b,
+            uint[2] memory c,
+            uint[3] memory input
+        ) external view returns (bool );
+}
+
+interface verifydefender{
+
+  function verifyProof(
+            uint[2] memory a,
+            uint[2][2] memory b,
+            uint[2] memory c,
+            uint[3] memory input
+        ) external view returns (bool );
+}
+
 abstract contract LoogiesContract {
   function tokenURI(uint256 id) external virtual view returns (string memory);
   function ownerOf(uint256 id) external virtual view returns (address);
 }
 
 contract Footsteps {
-  mapping(address =>uint) public  bal;
+
+  mapping(address=> Player) public players;
 
   LoogiesContract public loogiescontract;
-  address public verifier;
+  address public registerverifier;
+  address public moveverifier;
+  address public defendverifier;
+
   struct Block{
       uint position;  
   }
+
+  struct Attack{
+    uint xguess;
+    uint yguess;
+    bool active;
+    address attacker;
+  }
+
+  mapping(address =>Attack) public attacks;
 
   uint public constant height = 10;
   uint public constant width = 10;
@@ -40,12 +72,15 @@ contract Footsteps {
     uint zone;
   }
 
-  Player[] public players;
   mapping(address =>uint) public loogies;
 
-  constructor (address _verifier) public payable{
+  address[] public activeplayers;
+
+  constructor (address _registerverifier,address _moveverifier,address _defendverifier) public payable{
     // loogiescontract = LoogiesContract(_loogiescontract);
-    _verifier = verifier;
+    registerverifier = _registerverifier;
+    moveverifier = _moveverifier;
+    defendverifier = _defendverifier;
   }
 
   
@@ -54,8 +89,8 @@ contract Footsteps {
 **/
 
   function Register(uint LoogieId,uint[2] memory a,uint[2][2] memory b,uint[2] memory c,uint[2] memory input) external {
-    require(Iverifier(verifier).verifyProof(a,b,c,input) == true,"Invalid input");
-
+    require(Registerverifier(registerverifier).verifyProof(a,b,c,input) == true,"Invalid input");
+     if( players[msg.sender].player == msg.sender) revert AlreadyRegistered(msg.sender);
     Player memory  player = Player({
       player: msg.sender,
       health: 100,
@@ -63,12 +98,82 @@ contract Footsteps {
       zone: input[1]
     });
 
-    players.push(player);
+    players[msg.sender] = player;
     loogies[msg.sender] = LoogieId;
+    activeplayers.push(msg.sender);
   }
 
-  function getpayment() external payable {
-    bal[msg.sender] += msg.value;
+  function Move(uint[2] memory a,
+            uint[2][2] memory b,
+            uint[2] memory c,
+            uint[3] memory input) external {
+    require(Moveverifier(moveverifier).verifyProof(a,b,c,input) == true,"Invalid input");
+    require(attacks[msg.sender].active == false,"Defend!!");
+    Player memory player = players[msg.sender];
+    require(player.health >=8 ,"Player is dead");
+    require(player.location == input[0],"Invalid location");
+    player.location = input[1];
+    player.zone = input[2];
+    player.health = player.health - 4;
   }
+
+  function AttackPlayer(address player,uint x ,uint y) external {
+  attacks[player] = Attack({
+    xguess: x,
+    yguess: y,
+    active: true,
+    attacker: msg.sender
+  });
+  players[msg.sender].health -=8;
+  
+  }
+
+  function Defend(uint[2] memory a,
+            uint[2][2] memory b,
+            uint[2] memory c,
+            uint[3] memory input) external {
+    require(verifydefender(defendverifier).verifyProof(a,b,c,input) == true,"Invalid Proof");
+    require(attacks[msg.sender].active == true,"No attack");
+    require(input[0] == players[msg.sender].location,"Wrong Guess");
+    require(input[1] == attacks[msg.sender].xguess,"Don't cheat");
+    require(input[2] == attacks[msg.sender].yguess,"Don't cheat");
+
+    if(players[msg.sender].health > players[attacks[msg.sender].attacker].health){
+      players[msg.sender].health += ((players[attacks[msg.sender].attacker].health)/2);
+      players[attacks[msg.sender].attacker].health = (players[attacks[msg.sender].attacker].health)/2;
+      attacks[msg.sender].active = false;
+
+    }
+    else if(players[msg.sender].health == players[attacks[msg.sender].attacker].health) {
+
+      attacks[msg.sender].active = false;
+
+    }
+
+    else{
+
+      players[attacks[msg.sender].attacker].health += (players[msg.sender].health/2);
+      players[msg.sender].health -= (players[msg.sender].health /2);
+      attacks[msg.sender].active = false;
+
+    }
+
+  }
+
+  // function ExitandRenterGame() external {
+  //   require(players[msg.sender].player != 0x0000,"Not Player");
+  //   players[msg.sender] = Player({
+  //     player: 0x0000,
+  //     health: 0,
+  //     location: 0,
+  //     zone: 0
+  //   })
+  // }
+
+
+
+
+
+  
 }
 

@@ -53,5 +53,4 @@ export async function groth16calldata(input, wasm, zkey) {
     return [a, b, c, Input];
 
 
-
 }

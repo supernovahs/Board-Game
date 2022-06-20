@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   webpack: function (config, options) {
     if (!options.isServer) {
       config.resolve.fallback.fs = false;

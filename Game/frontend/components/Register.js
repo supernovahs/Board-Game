@@ -1,4 +1,4 @@
-import { gameproof } from "../proofs/match"
+import { RegisterProof } from "../proofs/register"
 import { useState } from "react";
 import { useSigner, useContract, useProvider } from "wagmi";
 const ethers = require("ethers");
@@ -11,7 +11,7 @@ export default function Register() {
 
     const register = async () => {
         const random = ethers.BigNumber.from(ethers.utils.randomBytes(32)).toString();
-        const res = await gameproof(xcoordinate, ycoordinate, 1, random);
+        const res = await RegisterProof(xcoordinate, ycoordinate, 1, random);
     }
 
     return (

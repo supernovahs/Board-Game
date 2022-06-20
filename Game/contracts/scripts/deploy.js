@@ -6,16 +6,26 @@ const deploy = async () => {
     const verifier = await registerverifier.deploy();
     await verifier.deployed();
 
-    console.log(" Verifier deployed to", verifier.address);
+    console.log(" Register Verifier deployed to", verifier.address);
+
+    const moveverifier = await hre.ethers.getContractFactory("Move");
+    const verifymove = await moveverifier.deploy();
+    await verifymove.deployed();
+
+    console.log(" Move Verifier deployed to", verifymove.address);
+
+    const defendverifier = await hre.ethers.getContractFactory("DefendVerifier");
+    const verifydefend = await defendverifier.deploy();
+    await verifydefend.deployed();
+
+    console.log(" Defend Verifier deployed to", verifydefend.address);
+
 
     const game = await hre.ethers.getContractFactory("Footsteps");
-    const gameInstance = await game.deploy(verifier.address);
+    const gameInstance = await game.deploy(verifier.address, verifymove.address, verifydefend.address);
     await gameInstance.deployed();
 
     console.log("Game contract deployed to ", gameInstance.address);
-
-
-
 
 }
 

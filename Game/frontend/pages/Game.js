@@ -16,6 +16,7 @@ export default function Game() {
         connector: new InjectedConnector(),
     })
 
+    let prov = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb");
     const { disconnect } = useDisconnect();
     const signer = useSigner();
     const provider = useProvider();
@@ -31,6 +32,9 @@ export default function Game() {
         contractInterface: gameabi.abi,
         signerOrProvider: provider
     })
+
+    // Ethers contract isntance to listen events
+    const contractevents = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
 
     const [xcoordinate, setXcoordinate] = useState(0);
     const [ycoordinate, setYcoordinate] = useState(0);
@@ -79,28 +83,27 @@ export default function Game() {
         }
         setboard(boardupdate);
         // console.log("board", board);
-    }, [100])
+    }, [10000])
 
     const register = async () => {
+        contractevents.on("register", (address, registered) => {
+            console.log('update', address, registered);
+            if (registered == true) {
+                let playerdata = {
+                    x: xcoordinate,
+                    y: ycoordinate,
+                    salt: random
+                }
+
+                window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                console.log("playerdata", playerdata);
+            }
+        })
         const random = ethers.BigNumber.from(ethers.utils.randomBytes(32)).toString();
         console.log("random", random);
         // console.log("zone", xcoordinate + 1);
         const res = await RegisterProof(xcoordinate, ycoordinate, Number(xcoordinate) + 1, random);
 
-        const playerdata = {
-            x: xcoordinate,
-            y: ycoordinate,
-            salt: random
-        }
-
-        window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-        console.log("player data", window.localStorage.getItem("playerdata"));
-
-        // let a = Array.from(Array(2), () => new Array(2));
-        // a[0][0] = res[1][0][0];
-        // a[0][1] = res[1][0][1];
-        // a[1][0] = res[1][1][0];
-        // a[1][1] = res[1][1][1];
         let result = await gamecontractwrite.Register(10, res[0], res[1], res[2], res[3], { gasLimit: 500000 });
     }
 
@@ -114,23 +117,28 @@ export default function Game() {
         let currenty = data.y;
         console.log("ran", ran, "currentx", currentx, "currenty", currenty);
 
+        contractevents.on("move", (address, registered) => {
+            console.log('update', address, registered);
+            if (registered == true) {
+                let playerdata = {
+                    x: Number(currentx) - 1,
+                    y: currenty,
+                    salt: ran
+                }
+
+                window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                console.log("playerdata", playerdata);
+            }
+        })
+        let r = await gamecontractwrite.players(signer.data._address);
+        let a = await r.location;
+        console.log("a", a);
         let res = await MoveProof(currentx, currenty, Number(currentx) - 1, currenty, ran, currentx);
         console.log("left move", res);
-        console.log("signer", signer.data._address);
         let location = await gamecontractwrite.players(signer.data._address);
-        console.log("locaiton", location);
-        let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 2000000 });
+        console.log("location", location);
+        let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 500000 });
         console.log("result", result);
-
-
-        let newlocation = {
-            x: data.x - 1,
-            y: data.y,
-            salt: data.salt
-        }
-
-        window.localStorage.setItem("playerdata", JSON.stringify(newlocation));
-
 
     }
 
@@ -143,18 +151,27 @@ export default function Game() {
         let currentx = data.x;
         let currenty = data.y;
 
+        contractevents.on("move", (address, registered) => {
+            console.log('update', address, registered);
+            if (registered == true) {
+                let playerdata = {
+                    x: Number(currentx) + 1,
+                    y: currenty,
+                    salt: ran
+                }
+
+                window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                console.log("playerdata", playerdata);
+            }
+        })
+
+
         let res = await MoveProof(currentx, currenty, Number(currentx) + 1, currenty, ran, Number(currentx) + 2);
         console.log("right move", res);
-        let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 800000 });
+        let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 500000 });
         console.log("result", result);
 
-        let newlocation = {
-            x: data.x + 1,
-            y: data.y,
-            salt: data.salt
-        }
 
-        window.localStorage.setItem("playerdata", JSON.stringify(newlocation));
     }
 
     const moveup = async () => {
@@ -166,18 +183,26 @@ export default function Game() {
         let currentx = data.x;
         let currenty = data.y;
 
+        contractevents.on("move", (address, registered) => {
+            console.log('update', address, registered);
+            if (registered == true) {
+                let playerdata = {
+                    x: currentx,
+                    y: Number(currenty) + 1,
+                    salt: ran
+                }
+
+                window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                console.log("playerdata", playerdata);
+            }
+        })
+
         let res = await MoveProof(currentx, currenty, currentx, Number(currenty) + 1, ran, Number(currentx) + 1);
         console.log("Up move", res);
-        let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 2000000 });
+        let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 500000 });
         console.log("result", result);
 
-        let newlocation = {
-            x: data.x,
-            y: data.y + 1,
-            salt: data.salt
-        }
 
-        window.localStorage.setItem("playerdata", JSON.stringify(newlocation));
 
     }
 
@@ -190,18 +215,25 @@ export default function Game() {
         let currentx = data.x;
         let currenty = data.y;
 
+        contractevents.on("move", (address, registered) => {
+            console.log('update', address, registered);
+            if (registered == true) {
+                let playerdata = {
+                    x: currentx,
+                    y: Number(currenty) - 1,
+                    salt: ran
+                }
+
+                window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                console.log("playerdata", playerdata);
+            }
+        })
+
         let res = await MoveProof(currentx, currenty, currentx, Number(currenty) - 1, ran, Number(currentx) + 1);
         console.log("Bottom move", res);
         let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 2000000 });
         console.log("result", result);
 
-        let newlocation = {
-            x: data.x,
-            y: data.y - 1,
-            salt: data.salt
-        }
-
-        window.localStorage.setItem("playerdata", JSON.stringify(newlocation));
     }
 
     const attack = async () => {

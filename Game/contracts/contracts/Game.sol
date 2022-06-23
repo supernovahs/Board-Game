@@ -39,6 +39,7 @@ contract Footsteps {
 
   mapping(address=> Player) public players;
   event register(address indexed player,bool registered);
+  event move(address indexed player, bool moved);
 
   LoogiesContract public loogiescontract;
   address public registerverifier;
@@ -111,12 +112,13 @@ contract Footsteps {
             uint[3] memory input) external {
     require(Moveverifier(moveverifier).verifyProof(a,b,c,input) == true,"Invalid input");
     require(attacks[msg.sender].active == false,"Defend!!");
-    Player memory player = players[msg.sender];
+    Player storage player = players[msg.sender];
     require(player.health >=8 ,"Player is dead");
     require(player.location == input[0],"Invalid location");
     player.location = input[1];
     player.zone = input[2];
     player.health = player.health - 4;
+    emit move(msg.sender,true);
   }
 
   function AttackPlayer(address player,uint x ,uint y) external {

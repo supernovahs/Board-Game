@@ -13,21 +13,20 @@ interface Registerverifier{
 
 interface Moveverifier{
   function verifyProof(
-            uint[2] memory a,
-            uint[2][2] memory b,
-            uint[2] memory c,
-            uint[3] memory input
+            uint[2] memory ,
+            uint[2][2] memory ,
+            uint[2] memory ,
+            uint[3] memory 
         ) external view returns (bool );
 }
 
-interface verifydefender{
-
+interface DefenseVerifier{
   function verifyProof(
             uint[2] memory a,
             uint[2][2] memory b,
             uint[2] memory c,
             uint[3] memory input
-        ) external view returns (bool );
+        ) external view returns (bool);
 }
 
 abstract contract LoogiesContract {
@@ -37,12 +36,14 @@ abstract contract LoogiesContract {
 
 contract Footsteps {
 
+
   mapping(address=> Player) public players;
+  event register(address indexed player,bool registered);
 
   LoogiesContract public loogiescontract;
   address public registerverifier;
   address public moveverifier;
-  address public defendverifier;
+  address public verifierdefend;
 
   struct Block{
       uint position;  
@@ -80,7 +81,7 @@ contract Footsteps {
     // loogiescontract = LoogiesContract(_loogiescontract);
     registerverifier = _registerverifier;
     moveverifier = _moveverifier;
-    defendverifier = _defendverifier;
+    verifierdefend = _defendverifier;
   }
 
   
@@ -101,7 +102,8 @@ contract Footsteps {
     players[msg.sender] = player;
     loogies[msg.sender] = LoogieId;
     activeplayers.push(msg.sender);
-  }
+    emit register(msg.sender,true);
+  } 
 
   function Move(uint[2] memory a,
             uint[2][2] memory b,
@@ -132,7 +134,8 @@ contract Footsteps {
             uint[2][2] memory b,
             uint[2] memory c,
             uint[3] memory input) external {
-    require(verifydefender(defendverifier).verifyProof(a,b,c,input) == true,"Invalid Proof");
+    require(DefenseVerifier(verifierdefend).verifyProof(a,b,c,input) == true, "Invalid");
+
     require(attacks[msg.sender].active == true,"No attack");
     require(input[0] == players[msg.sender].location,"Wrong Guess");
     require(input[1] == attacks[msg.sender].xguess,"Don't cheat");
@@ -169,6 +172,8 @@ contract Footsteps {
   //     zone: 0
   //   })
   // }
+
+  
 
 
 

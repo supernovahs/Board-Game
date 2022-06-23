@@ -1,0 +1,3 @@
+[submodule "Game/contracts/forge-std"]
+	path = Game/contracts/forge-std
+	url = git@github.com:foundry-rs/forge-std.git

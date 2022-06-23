@@ -14,12 +14,11 @@ const deploy = async () => {
 
     console.log(" Move Verifier deployed to", verifymove.address);
 
-    const defendverifier = await hre.ethers.getContractFactory("DefendVerifier");
+    const defendverifier = await hre.ethers.getContractFactory("DefendVerify");
     const verifydefend = await defendverifier.deploy();
     await verifydefend.deployed();
 
     console.log(" Defend Verifier deployed to", verifydefend.address);
-
 
     const game = await hre.ethers.getContractFactory("Footsteps");
     const gameInstance = await game.deploy(verifier.address, verifymove.address, verifydefend.address);

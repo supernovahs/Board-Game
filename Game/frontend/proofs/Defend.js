@@ -9,7 +9,6 @@ export async function DefendProof(x, y, salt) {
     }
 
     let res = await groth16calldata(input, "/Defend.wasm", "/Defend_0001.zkey");
-    console.log("res", res);
     return res;
 
 

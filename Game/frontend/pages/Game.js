@@ -42,6 +42,7 @@ export default function Game() {
     const [attackaddress, setattackaddress] = useState();
     const [attackx, setattackx] = useState();
     const [attacky, setattacky] = useState();
+    const [moved, setmoved] = useState(false);
 
     const width = 11;
     const height = 11;
@@ -63,7 +64,7 @@ export default function Game() {
                     player = (
                         <img src="/chris-sharkot-ball.svg"
                             style={{
-                                transform: "rotate(45deg) scale(1,3)",
+                                transform: "rotate(30deg) scale(1,3)",
                                 width: 100,
                                 height: 100,
                                 marginLeft: -10,
@@ -73,7 +74,7 @@ export default function Game() {
                     )
                 }
                 boardupdate.push(
-                    <div style={{ width: length, height: breadth, padding: 1, position: "absolute", left: length * x, top: breadth * y }}>
+                    <div style={{ width: length, height: breadth, padding: 1, position: "absolute", left: length * x, top: breadth * (10 - y) }}>
                         <div style={{ position: "relative", height: "100%", background: (x + y) % 2 ? "#BBBBBB" : "#EEEEEE" }}>
                             {player ? player : <span style={{ opacity: 0.4 }}>{"" + x + "," + y}</span>}
                         </div>
@@ -83,11 +84,12 @@ export default function Game() {
         }
         setboard(boardupdate);
         // console.log("board", board);
-    }, [10000])
+    }, [moved])
 
     const register = async () => {
-        contractevents.on("register", (address, registered) => {
-            console.log('update', address, registered);
+        const contracteventsregister = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
+
+        contracteventsregister.on("register", (address, registered) => {
             if (registered == true) {
                 let playerdata = {
                     x: xcoordinate,
@@ -97,14 +99,28 @@ export default function Game() {
 
                 window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
                 console.log("playerdata", playerdata);
+                setmoved(!moved);
+                let updated = 0;
+                console.log("updated location in local storage!!!")
+                let newstore = window.localStorage.getItem("playerdata");
+                let newstoredata = JSON.parse(newstore);
+
+                while (updated == 0) {
+                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                    if (newstoredata.x == xcoordinate && newstoredata.y == ycoordinate && newstoredata.salt == random) {
+                        console.log("registered successfully")
+                        updated = 1;
+                    }
+                }
+
+
             }
         })
         const random = ethers.BigNumber.from(ethers.utils.randomBytes(32)).toString();
-        console.log("random", random);
-        // console.log("zone", xcoordinate + 1);
         const res = await RegisterProof(xcoordinate, ycoordinate, Number(xcoordinate) + 1, random);
 
         let result = await gamecontractwrite.Register(10, res[0], res[1], res[2], res[3], { gasLimit: 500000 });
+        console.log("result", result);
     }
 
     const moveleft = async () => {
@@ -115,9 +131,9 @@ export default function Game() {
         let ran = data.salt;
         let currentx = data.x;
         let currenty = data.y;
-        console.log("ran", ran, "currentx", currentx, "currenty", currenty);
+        const contracteventsleft = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
 
-        contractevents.on("move", (address, registered) => {
+        contracteventsleft.on("move", (address, registered) => {
             console.log('update', address, registered);
             if (registered == true) {
                 let playerdata = {
@@ -127,7 +143,22 @@ export default function Game() {
                 }
 
                 window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                console.log("playerdata", playerdata);
+                console.log("move left", playerdata);
+                setmoved(!moved);
+                let updated = 0;
+                console.log("updated location in local storage!!!")
+                let newstore = window.localStorage.getItem("playerdata");
+                let newstoredata = JSON.parse(newstore);
+
+                while (updated == 0) {
+                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                    if (newstoredata.x == (Number(currentx) - 1) && newstoredata.y == currenty && newstoredata.salt == ran) {
+                        console.log("registered successfully")
+                        updated = 1;
+                    }
+                }
+
+
             }
         })
         let r = await gamecontractwrite.players(signer.data._address);
@@ -138,7 +169,6 @@ export default function Game() {
         let location = await gamecontractwrite.players(signer.data._address);
         console.log("location", location);
         let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 500000 });
-        console.log("result", result);
 
     }
 
@@ -151,7 +181,9 @@ export default function Game() {
         let currentx = data.x;
         let currenty = data.y;
 
-        contractevents.on("move", (address, registered) => {
+        const contracteventsright = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
+
+        contracteventsright.on("move", (address, registered) => {
             console.log('update', address, registered);
             if (registered == true) {
                 let playerdata = {
@@ -161,7 +193,20 @@ export default function Game() {
                 }
 
                 window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                console.log("playerdata", playerdata);
+                console.log("move right", playerdata);
+                setmoved(!moved);
+                let updated = 0;
+                console.log("updated location in local storage!!!")
+                let newstore = window.localStorage.getItem("playerdata");
+                let newstoredata = JSON.parse(newstore);
+
+                while (updated == 0) {
+                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                    if (newstoredata.x == (Number(currentx) + 1) && newstoredata.y == currenty && newstoredata.salt == ran) {
+                        console.log("registered successfully")
+                        updated = 1;
+                    }
+                }
             }
         })
 
@@ -169,8 +214,6 @@ export default function Game() {
         let res = await MoveProof(currentx, currenty, Number(currentx) + 1, currenty, ran, Number(currentx) + 2);
         console.log("right move", res);
         let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 500000 });
-        console.log("result", result);
-
 
     }
 
@@ -182,8 +225,9 @@ export default function Game() {
         let ran = data.salt;
         let currentx = data.x;
         let currenty = data.y;
+        const contracteventsup = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
 
-        contractevents.on("move", (address, registered) => {
+        contracteventsup.on("move", (address, registered) => {
             console.log('update', address, registered);
             if (registered == true) {
                 let playerdata = {
@@ -194,15 +238,26 @@ export default function Game() {
 
                 window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
                 console.log("playerdata", playerdata);
+                setmoved(!moved);
+                let updated = 0;
+                console.log("updated location in local storage!!!")
+                let newstore = window.localStorage.getItem("playerdata");
+                let newstoredata = JSON.parse(newstore);
+
+                while (updated == 0) {
+                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                    if (newstoredata.x == (currentx) && newstoredata.y == (Number(currenty) + 1) && newstoredata.salt == ran) {
+                        console.log("registered successfully")
+                        updated = 1;
+                    }
+                }
+
             }
         })
 
         let res = await MoveProof(currentx, currenty, currentx, Number(currenty) + 1, ran, Number(currentx) + 1);
         console.log("Up move", res);
         let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 500000 });
-        console.log("result", result);
-
-
 
     }
 
@@ -214,8 +269,10 @@ export default function Game() {
         let ran = data.salt;
         let currentx = data.x;
         let currenty = data.y;
+        const contracteventsbottom = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
 
-        contractevents.on("move", (address, registered) => {
+
+        contracteventsbottom.on("move", (address, registered) => {
             console.log('update', address, registered);
             if (registered == true) {
                 let playerdata = {
@@ -225,7 +282,20 @@ export default function Game() {
                 }
 
                 window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                console.log("playerdata", playerdata);
+                console.log("move bottom", playerdata);
+                setmoved(!moved);
+                let updated = 0;
+                console.log("updated location in local storage!!!")
+                let newstore = window.localStorage.getItem("playerdata");
+                let newstoredata = JSON.parse(newstore);
+
+                while (updated == 0) {
+                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                    if (newstoredata.x == currentx && newstoredata.y == (Number(currenty) - 1) && newstoredata.salt == ran) {
+                        console.log("registered successfully")
+                        updated = 1;
+                    }
+                }
             }
         })
 
@@ -233,7 +303,6 @@ export default function Game() {
         console.log("Bottom move", res);
         let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 2000000 });
         console.log("result", result);
-
     }
 
     const attack = async () => {
@@ -357,7 +426,7 @@ export default function Game() {
 
 
             <div style={{ transform: "scale(0.8,0.3)" }}>
-                <div style={{ transform: "rotate(-45deg)", color: "#111111", fontWeight: "bold", width: width * 64, height: height * 64, margin: "auto", position: "relative" }}>
+                <div style={{ transform: "rotate(-30deg)", color: "#111111", fontWeight: "bold", width: width * 64, height: height * 64, margin: "auto", position: "relative" }}>
 
                     <div style={{ opacity: 0.7, position: "absolute", left: length / 2 - 10, top: 0 }}>{board}</div>
                 </div>

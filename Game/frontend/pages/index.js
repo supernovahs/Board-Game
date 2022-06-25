@@ -21,38 +21,7 @@ export default function Home() {
 
         <div style={{ width: 50 }} >
           <Entergame />
-          {/* <button
-            className={styles.button}
-            onClick={async () => {
-              console.log("click")
-              setsalt(ethers.utils.randomBytes(32).toString())
 
-              const input = {
-                a: 0,
-                b: 5,
-                salt: 10,
-                zone: 1
-              }
-
-              console.log("Input", input);
-              const { proof, publicSignals } = await groth16.fullProve(input, "/Register.wasm", "/Register_final.zkey");
-              console.log("proof", proof);
-              console.log("publicSignal", publicSignals);
-
-
-
-
-
-
-
-
-
-            }}
-
-
-          >
-            Click
-          </button> */}
 
         </div>
 

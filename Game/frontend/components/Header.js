@@ -16,7 +16,13 @@ export default function Header() {
         <button onClick={() => disconnect()}>Disconnect</button>
     </div>)
     return (
-        <button onClick={() => connect()}>Connect Wallet</button>
+        <header className="flex flex-wrap justify-between p-5 mb-10">
+
+            <button
+                className="text-lg font-medium rounded-md px-5 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500"
+
+                onClick={() => connect()}>Connect Wallet</button>
+        </header>
 
     )
 }

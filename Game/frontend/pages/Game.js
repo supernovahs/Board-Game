@@ -10,6 +10,9 @@ import { useAccount, useConnect, useEnsName } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MoveProof } from "../proofs/move";
 import { DefendProof } from "../proofs/Defend";
+// import { styles } from "../styles/globals.css";
+import { styles } from "../styles/Home.module.css";
+
 export default function Game() {
     const { data: account } = useAccount()
     const { connect } = useConnect({
@@ -43,6 +46,12 @@ export default function Game() {
     const [attackx, setattackx] = useState();
     const [attacky, setattacky] = useState();
     const [moved, setmoved] = useState(false);
+    const [health, sethealth] = useState();
+    const [zone, setzone] = useState();
+
+    const address = useAccount()?.data?.address;
+
+    console.log('addrress', address);
 
     const width = 11;
     const height = 11;
@@ -86,6 +95,69 @@ export default function Game() {
         // console.log("board", board);
     }, [moved])
 
+    const contractlistener = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
+    const eventlistener = (direction) => {
+
+        contractlistener.on("move", (address, moves) => {
+            if (moves == true) {
+                const data = window.localStorage.getItem("playerdata");
+                const parsedata = JSON.parse(data);
+
+                if (direction == 0) {
+                    let playerdata = {
+                        x: Number(parsedata.x) - 1,
+                        y: parsedata.y,
+                        salt: parsedata.salt
+
+                    }
+                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                    console.log("playerdata", playerdata);
+                    setmoved(!moved);
+                }
+                else if (direction == 1) {
+                    let playerdata = {
+                        x: Number(parsedata.x) + 1,
+                        y: parsedata.y,
+                        salt: parsedata.salt
+                    }
+                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                    console.log("playerdata", playerdata);
+                    setmoved(!moved);
+
+                }
+                else if (direction == 2) {
+                    let playerdata = {
+                        x: parsedata.x,
+                        y: Number(parsedata.y) + 1,
+                        salt: parsedata.salt
+                    }
+                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                    console.log("playerdata", playerdata);
+                    setmoved(!moved);
+
+                }
+                else if (direction == 3) {
+                    let playerdata = {
+                        x: parsedata.x,
+                        y: Number(parsedata.y) - 1,
+                        salt: parsedata.salt
+                    }
+                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
+                    console.log("playerdata", playerdata);
+                    setmoved(!moved);
+
+                }
+                contractlistener.removeAllListeners('move');
+
+
+            }
+        })
+
+
+
+
+    }
+
     const register = async () => {
         const contracteventsregister = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
 
@@ -98,17 +170,17 @@ export default function Game() {
                 }
 
                 window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                console.log("playerdata", playerdata);
+                // console.log("playerdata", playerdata);
                 setmoved(!moved);
                 let updated = 0;
-                console.log("updated location in local storage!!!")
+                // console.log("updated location in local storage!!!")
                 let newstore = window.localStorage.getItem("playerdata");
                 let newstoredata = JSON.parse(newstore);
 
                 while (updated == 0) {
                     window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
                     if (newstoredata.x == xcoordinate && newstoredata.y == ycoordinate && newstoredata.salt == random) {
-                        console.log("registered successfully")
+                        // console.log("registered successfully")
                         updated = 1;
                     }
                 }
@@ -118,9 +190,9 @@ export default function Game() {
         })
         const random = ethers.BigNumber.from(ethers.utils.randomBytes(32)).toString();
         const res = await RegisterProof(xcoordinate, ycoordinate, Number(xcoordinate) + 1, random);
-
+        console.log("res", res);
         let result = await gamecontractwrite.Register(10, res[0], res[1], res[2], res[3], { gasLimit: 500000 });
-        console.log("result", result);
+        // console.log("result", result);
     }
 
     const moveleft = async () => {
@@ -131,43 +203,16 @@ export default function Game() {
         let ran = data.salt;
         let currentx = data.x;
         let currenty = data.y;
-        const contracteventsleft = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
 
-        contracteventsleft.on("move", (address, registered) => {
-            console.log('update', address, registered);
-            if (registered == true) {
-                let playerdata = {
-                    x: Number(currentx) - 1,
-                    y: currenty,
-                    salt: ran
-                }
+        eventlistener(0);
 
-                window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                console.log("move left", playerdata);
-                setmoved(!moved);
-                let updated = 0;
-                console.log("updated location in local storage!!!")
-                let newstore = window.localStorage.getItem("playerdata");
-                let newstoredata = JSON.parse(newstore);
-
-                while (updated == 0) {
-                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                    if (newstoredata.x == (Number(currentx) - 1) && newstoredata.y == currenty && newstoredata.salt == ran) {
-                        console.log("registered successfully")
-                        updated = 1;
-                    }
-                }
-
-
-            }
-        })
-        let r = await gamecontractwrite.players(signer.data._address);
+        let r = await gamecontractwrite.players(address);
         let a = await r.location;
-        console.log("a", a);
+        // console.log("a", a);
         let res = await MoveProof(currentx, currenty, Number(currentx) - 1, currenty, ran, currentx);
         console.log("left move", res);
-        let location = await gamecontractwrite.players(signer.data._address);
-        console.log("location", location);
+        let location = await gamecontractwrite.players(address);
+        // console.log("location", location);
         let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 500000 });
 
     }
@@ -175,40 +220,13 @@ export default function Game() {
     const moveright = async () => {
 
         const pdata = window.localStorage.getItem("playerdata");
-        console.log("pdata", pdata);
+        // console.log("pdata", pdata);
         let data = JSON.parse(pdata);
         let ran = data.salt;
         let currentx = data.x;
         let currenty = data.y;
 
-        const contracteventsright = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
-
-        contracteventsright.on("move", (address, registered) => {
-            console.log('update', address, registered);
-            if (registered == true) {
-                let playerdata = {
-                    x: Number(currentx) + 1,
-                    y: currenty,
-                    salt: ran
-                }
-
-                window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                console.log("move right", playerdata);
-                setmoved(!moved);
-                let updated = 0;
-                console.log("updated location in local storage!!!")
-                let newstore = window.localStorage.getItem("playerdata");
-                let newstoredata = JSON.parse(newstore);
-
-                while (updated == 0) {
-                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                    if (newstoredata.x == (Number(currentx) + 1) && newstoredata.y == currenty && newstoredata.salt == ran) {
-                        console.log("registered successfully")
-                        updated = 1;
-                    }
-                }
-            }
-        })
+        eventlistener(1);
 
 
         let res = await MoveProof(currentx, currenty, Number(currentx) + 1, currenty, ran, Number(currentx) + 2);
@@ -220,40 +238,13 @@ export default function Game() {
     const moveup = async () => {
 
         const pdata = window.localStorage.getItem("playerdata");
-        console.log("pdata", pdata);
+        // console.log("pdata", pdata);
         let data = JSON.parse(pdata);
         let ran = data.salt;
         let currentx = data.x;
         let currenty = data.y;
-        const contracteventsup = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
 
-        contracteventsup.on("move", (address, registered) => {
-            console.log('update', address, registered);
-            if (registered == true) {
-                let playerdata = {
-                    x: currentx,
-                    y: Number(currenty) + 1,
-                    salt: ran
-                }
-
-                window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                console.log("playerdata", playerdata);
-                setmoved(!moved);
-                let updated = 0;
-                console.log("updated location in local storage!!!")
-                let newstore = window.localStorage.getItem("playerdata");
-                let newstoredata = JSON.parse(newstore);
-
-                while (updated == 0) {
-                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                    if (newstoredata.x == (currentx) && newstoredata.y == (Number(currenty) + 1) && newstoredata.salt == ran) {
-                        console.log("registered successfully")
-                        updated = 1;
-                    }
-                }
-
-            }
-        })
+        eventlistener(2);
 
         let res = await MoveProof(currentx, currenty, currentx, Number(currenty) + 1, ran, Number(currentx) + 1);
         console.log("Up move", res);
@@ -264,45 +255,18 @@ export default function Game() {
     const movebottom = async () => {
 
         const pdata = window.localStorage.getItem("playerdata");
-        console.log("pdata", pdata);
+        // console.log("pdata", pdata);
         let data = JSON.parse(pdata);
         let ran = data.salt;
         let currentx = data.x;
         let currenty = data.y;
-        const contracteventsbottom = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
 
-
-        contracteventsbottom.on("move", (address, registered) => {
-            console.log('update', address, registered);
-            if (registered == true) {
-                let playerdata = {
-                    x: currentx,
-                    y: Number(currenty) - 1,
-                    salt: ran
-                }
-
-                window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                console.log("move bottom", playerdata);
-                setmoved(!moved);
-                let updated = 0;
-                console.log("updated location in local storage!!!")
-                let newstore = window.localStorage.getItem("playerdata");
-                let newstoredata = JSON.parse(newstore);
-
-                while (updated == 0) {
-                    window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                    if (newstoredata.x == currentx && newstoredata.y == (Number(currenty) - 1) && newstoredata.salt == ran) {
-                        console.log("registered successfully")
-                        updated = 1;
-                    }
-                }
-            }
-        })
+        eventlistener(3);
 
         let res = await MoveProof(currentx, currenty, currentx, Number(currenty) - 1, ran, Number(currentx) + 1);
         console.log("Bottom move", res);
         let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 2000000 });
-        console.log("result", result);
+        // console.log("result", result);
     }
 
     const attack = async () => {
@@ -311,8 +275,8 @@ export default function Game() {
     }
 
     const defend = async () => {
-        let xcoordinateguess = await gamecontractwrite.attacks(signer.data._address);
-        let ycoordinateguess = await gamecontractwrite.attacks(signer.data._address);
+        let xcoordinateguess = await gamecontractwrite.attacks(address);
+        let ycoordinateguess = await gamecontractwrite.attacks(address);
         console.log("xguess", Number(xcoordinateguess.xguess), "yguess", Number(ycoordinateguess.yguess));
         const pdata = window.localStorage.getItem("playerdata");
         console.log("pdata", pdata);
@@ -325,9 +289,23 @@ export default function Game() {
         } catch (err) {
             console.log("error", err);
         }
-        let a = await gamecontractwrite.attacks(signer.data._address);
+        let a = await gamecontractwrite.attacks(address);
         console.log("a", a);
     }
+    useEffect(() => {
+
+        const getstats = async () => {
+            if (address) {
+                let data = await gamecontractread.players(address);
+                let health = data.health;
+                let playerzone = data.zone;
+                console.log("health", health);
+                setzone(playerzone);
+                sethealth(health);
+            }
+        }
+        getstats();
+    }, [moved, address])
 
     return (
         <div>
@@ -421,6 +399,17 @@ export default function Game() {
             >
 
                 Defend</button>
+
+            <div style={{ border: "2px solid black" }}>
+                <h1>
+                    Your Stats
+                    <div>
+
+                        {health && (<h2>Health: {Number(health)}</h2>)}
+                        {zone && (<h2>Zone: {Number(zone)}</h2>)}
+                    </div>
+                </h1>
+            </div>
 
 
 

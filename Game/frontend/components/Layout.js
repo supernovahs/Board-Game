@@ -9,7 +9,7 @@ export default function Layout({ children }) {
 
 
             <div>
-                <Header />
+                <Header style={{ margin: "10" }} />
                 <main >{children}
                 </main>
             </div>

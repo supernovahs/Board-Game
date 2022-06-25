@@ -1,9 +1,16 @@
 import Layout from '../components/Layout'
 import '../styles/globals.css'
 import networks from "../utils/networks.json";
-import { WagmiConfig, createClient } from 'wagmi'
-const client = createClient();
+import { WagmiConfig, createClient, createStorage } from 'wagmi'
+let client;
+if (typeof window !== 'undefined') {
 
+  client = createClient(
+    {
+      storage: createStorage({ storage: window.localStorage })
+    }
+  );
+}
 
 
 

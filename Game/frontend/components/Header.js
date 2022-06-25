@@ -12,14 +12,32 @@ export default function Header() {
     })
     const { disconnect } = useDisconnect();
 
-    if (account) return (<div>Connected to {account.address}
-        <button onClick={() => disconnect()}>Disconnect</button>
-    </div>)
+    if (account) {
+
+        let link = "https://etherscan.io/address/" + account.address;
+
+        return (<div class="divide-{red}">
+            {/* <div className="top-4 right-30  absolute"><p class="text-xl font-mono ">Connected to</p>
+                <a href={link} target="_blank">
+                    {(account.address).substring(0, 6) + "..."}
+                </a>
+            </div>) */}
+            <div className="p-5 mb-4 relative">
+                <p class="text-xl font-mono ">Connected to</p>
+                <a href={link} target="_blank">
+                    {(account.address).substring(0, 6) + "..."}
+                </a>
+                <button className="text-lg font-medium rounded-md bg-sky-300 hover:bg-violet-400 px-6 py-4 top-3 right-3 absolute" onClick={() => disconnect()}>Disconnect</button>
+            </div>
+        </div>
+        )
+    }
+
     return (
-        <header className="flex flex-wrap justify-between p-5 mb-10">
+        <header className="  p-5 mb-4 relative">
 
             <button
-                className="text-lg font-medium rounded-md px-5 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500"
+                className="text-lg font-medium rounded-md bg-sky-300 hover:bg-violet-400 px-6 py-4 top-3 right-3 absolute"
 
                 onClick={() => connect()}>Connect Wallet</button>
         </header>

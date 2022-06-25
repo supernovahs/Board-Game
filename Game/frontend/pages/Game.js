@@ -48,6 +48,7 @@ export default function Game() {
     const [moved, setmoved] = useState(false);
     const [health, sethealth] = useState();
     const [zone, setzone] = useState();
+    const [gameover, setgameover] = useState(false);
 
     const address = useAccount()?.data?.address;
 
@@ -158,6 +159,8 @@ export default function Game() {
 
     }
 
+
+
     const register = async () => {
         const contracteventsregister = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
 
@@ -184,6 +187,7 @@ export default function Game() {
                         updated = 1;
                     }
                 }
+                setgameover(false);
 
 
             }
@@ -216,6 +220,7 @@ export default function Game() {
         let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], { gasLimit: 500000 });
 
     }
+
 
     const moveright = async () => {
 
@@ -307,121 +312,175 @@ export default function Game() {
         getstats();
     }, [moved, address])
 
+    useEffect(() => {
+        if (Number(health) <= 8) {
+            setgameover(true);
+        }
+    }, [health])
+
+
     return (
         <div>
-            <input
-                placeholder="x coordinate"
-                onChange={(e) => {
-                    setXcoordinate(e.target.value);
-                    console.log("x", xcoordinate);
-                }}
-            />
-            <input
-                placeholder="y coordinate"
-                onChange={(e) => {
-                    setYcoordinate(e.target.value);
-                    console.log("y", ycoordinate);
-                }}
-            />
+            {gameover ?
+                <div>
+                    <h1 class="text-5xl relative ">Play Game!!</h1>
+                    <div className=" border-4 border-red-600 rounded hover:rounded-lg">
 
-            <button
-                onClick={() => {
-                    register();
-                }}
-            >
-                Register
-            </button>
+                        <h2 class="text-2xl my-2 mx-2 ">Rules </h2>
+                        <ul class='list-disc mx-8 my-5'>
+                            <li>Welcome to footsteps</li>
+                            <li>This is a persistent Board Game where players land and there location is hidden from everyone else.</li>
+                            <li>Only a hint is given to other players as you move accross the board.</li>
+                            <li>Health is reduced when you move .</li>
+                            <li>Your aim is to guess another player's location using the hints,if right, you get his half health</li>
 
-            <button
-
-                onClick={() => {
-                    moveleft();
-
-                }}
-            >Move Left</button>
-
-            <button
-
-                onClick={() => {
-                    moveright();
-
-                }}
-            >Move Right</button>
-
-            <button
-
-                onClick={() => {
-                    moveup();
-
-                }}
-            >Move Up</button>
-
-            <button
-
-                onClick={() => {
-                    movebottom();
-
-                }}
-            >Move Down</button>
-
-            <input
-                placeholder="Location of x coordinate of victim "
-                onChange={(e) => {
-                    setattackx(e.target.value);
-                }}
-            />
-
-            <input
-                placeholder="location of y coordinate of victim"
-                onChange={(e) => {
-                    setattacky(e.target.value);
-                }}
-
-            />
-
-            <input
-                placeholder="address of victim"
-                onChange={(e) => {
-                    setattackaddress(e.target.value);
-                }}
-            />
-
-            <button
-                onClick={() => {
-                    attack();
-                }}
-            >Attack</button>
-
-            <button
-                onClick={() => {
-                    defend();
-                }}
-            >
-
-                Defend</button>
-
-            <div style={{ border: "2px solid black" }}>
-                <h1>
-                    Your Stats
-                    <div>
-
-                        {health && (<h2>Health: {Number(health)}</h2>)}
-                        {zone && (<h2>Zone: {Number(zone)}</h2>)}
+                            <p>****</p>
+                            <li>Attacking costs 8pts health.</li>
+                            <li>Moving costs 4pts</li>
+                            <li>If you get attacked you can't move until you prove your location.</li>
+                            <li>You lose if your health is less than 8 </li>
+                            <p >****</p>
+                        </ul>
                     </div>
-                </h1>
-            </div>
 
 
 
+                    <div className=" flex flex-col ">
+                        <div>
 
-            <div style={{ transform: "scale(0.8,0.3)" }}>
-                <div style={{ transform: "rotate(-30deg)", color: "#111111", fontWeight: "bold", width: width * 64, height: height * 64, margin: "auto", position: "relative" }}>
+                            <input
+                                class="mx-8 my-6 p-2 border-2 border-indigo-600 rounded-lg"
+                                placeholder="x coordinate"
+                                onChange={(e) => {
+                                    setXcoordinate(e.target.value);
+                                    console.log("x", xcoordinate);
+                                }}
+                            />
+                        </div>
+                        <div>
 
-                    <div style={{ opacity: 0.7, position: "absolute", left: length / 2 - 10, top: 0 }}>{board}</div>
+                            <input
+                                class="mx-8 my-4 p-2 border-2 border-indigo-600 rounded-lg"
+                                placeholder="y coordinate"
+                                onChange={(e) => {
+                                    setYcoordinate(e.target.value);
+                                    console.log("y", ycoordinate);
+                                }}
+                            />
+                        </div>
+                        <div>
+
+                            <button
+                                class="mx-8 my-4 p-2 border-2 border-indigo-600 rounded-lg bg-indigo-400 hover:bg-indigo-500"
+                                onClick={() => {
+                                    register();
+                                }}
+                            >
+                                Register
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
 
-            </div>
+                : (
 
+                    <div>
+
+
+                        <button
+
+                            onClick={() => {
+                                moveleft();
+
+                            }}
+                        >Move Left</button>
+
+                        <button
+
+                            onClick={() => {
+                                moveright();
+
+                            }}
+                        >Move Right</button>
+
+                        <button
+
+                            onClick={() => {
+                                moveup();
+
+                            }}
+                        >Move Up</button>
+
+                        <button
+
+                            onClick={() => {
+                                movebottom();
+
+                            }}
+                        >Move Down</button>
+
+                        <input
+                            placeholder="Location of x coordinate of victim "
+                            onChange={(e) => {
+                                setattackx(e.target.value);
+                            }}
+                        />
+
+                        <input
+                            placeholder="location of y coordinate of victim"
+                            onChange={(e) => {
+                                setattacky(e.target.value);
+                            }}
+
+                        />
+
+                        <input
+                            placeholder="address of victim"
+                            onChange={(e) => {
+                                setattackaddress(e.target.value);
+                            }}
+                        />
+
+                        <button
+                            onClick={() => {
+                                attack();
+                            }}
+                        >Attack</button>
+
+                        <button
+                            onClick={() => {
+                                defend();
+                            }}
+                        >
+
+                            Defend</button>
+
+                        <div style={{ border: "2px solid black" }}>
+                            <h1>
+                                Your Stats
+                                <div>
+
+                                    {health && (<h2>Health: {Number(health)}</h2>)}
+                                    {zone && (<h2>Zone: {Number(zone)}</h2>)}
+                                </div>
+                            </h1>
+                        </div>
+
+
+
+
+                        <div style={{ transform: "scale(0.8,0.3)" }}>
+                            <div style={{ transform: "rotate(-30deg)", color: "#111111", fontWeight: "bold", width: width * 64, height: height * 64, margin: "auto", position: "relative" }}>
+
+                                <div style={{ opacity: 0.7, position: "absolute", left: length / 2 - 10, top: 0 }}>{board}</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                )
+            }
         </div>
 
     )

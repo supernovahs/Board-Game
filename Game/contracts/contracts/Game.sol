@@ -117,7 +117,7 @@ contract Footsteps {
     require(player.location == input[0],"Invalid location");
     player.location = input[1];
     player.zone = input[2];
-    player.health = player.health - 4;
+    player.health = player.health - 12;
     emit move(msg.sender,true);
   }
 

@@ -37,6 +37,10 @@ module.exports = {
     kovan: {
       url: "https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb",
       accounts: [process.env.PRIVATE_KEY],
+    },
+    devnet: {
+      url: "https://api.s0.ps.hmny.io",
+      accounts: [process.env.PRIVATE_KEY],
     }
   },
 };

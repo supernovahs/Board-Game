@@ -3,18 +3,19 @@ import Link from "next/link";
 
 export default function Entergame() {
 
-
     return (
-        <div className="flex flex-wrap justify-center items-center place-items-center gap-10">
-
+        // ToDo : Add a bg image here
+        // <div className="bg-landing flex flex-wrap absolute">
+        <div className="flex absolute  rounded-md justify-center items-center bg-red-400 ">
             <Link href="/Game">
-                <a>
-
-                    Enter Game
-                </a>
+                <div style={{ alignItems: "center", justifyContent: "center", width: "100%", height: "100%" }}>
+                    <a className="text-6xl hover:bg-sky-400" >
+                        Enter Game
+                    </a>
+                </div>
             </Link>
-
-        </div>
+        </div >
+        // </div>
     )
 }
 

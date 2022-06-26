@@ -10,6 +10,25 @@ import { useAccount, useConnect, useEnsName } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MoveProof } from "../proofs/move";
 import { DefendProof } from "../proofs/Defend";
+import { useDisclosure } from '@chakra-ui/react'
+import {
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
+} from '@chakra-ui/react'
+import React from "react";
+import { Input } from '@chakra-ui/react'
+import {
+    FormControl,
+    FormLabel,
+    FormErrorMessage,
+    FormHelperText,
+} from '@chakra-ui/react'
+import { Button, ButtonGroup } from '@chakra-ui/react'
 // import { styles } from "../styles/globals.css";
 import { styles } from "../styles/Home.module.css";
 
@@ -30,14 +49,14 @@ export default function Game() {
         signerOrProvider: signer.data
     })
 
+    // Game contract instance using wagmi for write access
     const gamecontractread = useContract({
         addressOrName: contractAddress.Game,
         contractInterface: gameabi.abi,
         signerOrProvider: provider
     })
 
-    // Ethers contract isntance to listen events
-    const contractevents = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);
+    // Constants 
 
     const [xcoordinate, setXcoordinate] = useState(0);
     const [ycoordinate, setYcoordinate] = useState(0);
@@ -49,8 +68,12 @@ export default function Game() {
     const [health, sethealth] = useState();
     const [zone, setzone] = useState();
     const [gameover, setgameover] = useState(false);
-
     const address = useAccount()?.data?.address;
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const [attacked, setattacked] = useState(false);
+
+    const initialRef = React.useRef(null)
+    const finalRef = React.useRef(null)
 
     console.log('addrress', address);
 
@@ -85,7 +108,7 @@ export default function Game() {
                 }
                 boardupdate.push(
                     <div style={{ width: length, height: breadth, padding: 1, position: "absolute", left: length * x, top: breadth * (10 - y) }}>
-                        <div style={{ position: "relative", height: "100%", background: (x + y) % 2 ? "#BBBBBB" : "#EEEEEE" }}>
+                        <div style={{ position: "relative", height: "100%", background: (x + y) % 2 ? " #FCF10A" : "#060606" }}>
                             {player ? player : <span style={{ opacity: 0.4 }}>{"" + x + "," + y}</span>}
                         </div>
                     </div>
@@ -318,17 +341,33 @@ export default function Game() {
         }
     }, [health])
 
+    useEffect(() => {
+        const attackerdetails = async () => {
+
+            let a = await gamecontractwrite.attacks(address).active;
+            setattacked(a);
+            if (attacked) {
+                console.log("attacked")
+                onOpen();
+            }
+        }
+        attackerdetails();
+    }, [1000])
+
 
     return (
         <div>
             {gameover ?
                 <div>
-                    <h1 class="text-5xl relative ">Play Game!!</h1>
+                    <div style={{ justifyContent: "center", alignItems: "center", position: "relative" }}>
+                        <h1 class="text-5xl my-10">Play Game!!</h1>
+                    </div>
                     <div className=" border-4 border-red-600 rounded hover:rounded-lg">
 
                         <h2 class="text-2xl my-2 mx-2 ">Rules </h2>
-                        <ul class='list-disc mx-8 my-5'>
-                            <li>Welcome to footsteps</li>
+
+                        <ul class='list-disc mx-8 my-5' style={{ textAlign: "center" }} >
+                            <li > <b> Welcome to footsteps</b></li>
                             <li>This is a persistent Board Game where players land and there location is hidden from everyone else.</li>
                             <li>Only a hint is given to other players as you move accross the board.</li>
                             <li>Health is reduced when you move .</li>
@@ -345,7 +384,7 @@ export default function Game() {
 
 
 
-                    <div className=" flex flex-col ">
+                    <div className=" flex flex-col " style={{ justifyContent: "center", alignItems: "center" }}>
                         <div>
 
                             <input
@@ -387,75 +426,83 @@ export default function Game() {
 
                     <div>
 
+                        <div>
 
-                        <button
+                            <Button
 
-                            onClick={() => {
-                                moveleft();
+                                onClick={() => {
+                                    moveleft();
 
-                            }}
-                        >Move Left</button>
+                                }}
+                            >Move Left</Button>
 
-                        <button
+                            <Button
 
-                            onClick={() => {
-                                moveright();
+                                onClick={() => {
+                                    moveright();
 
-                            }}
-                        >Move Right</button>
+                                }}
+                            >Move Right</Button>
 
-                        <button
+                            <Button
 
-                            onClick={() => {
-                                moveup();
+                                onClick={() => {
+                                    moveup();
 
-                            }}
-                        >Move Up</button>
+                                }}
+                            >Move Up</Button>
 
-                        <button
+                            <Button
 
-                            onClick={() => {
-                                movebottom();
+                                onClick={() => {
+                                    movebottom();
 
-                            }}
-                        >Move Down</button>
+                                }}
+                            >Move Down</Button>
+                        </div>
+                        {/* Attack div */}
+                        <div>
 
-                        <input
-                            placeholder="Location of x coordinate of victim "
-                            onChange={(e) => {
-                                setattackx(e.target.value);
-                            }}
-                        />
+                            <input
+                                placeholder="Location of x coordinate of victim "
+                                onChange={(e) => {
+                                    setattackx(e.target.value);
+                                }}
+                            />
 
-                        <input
-                            placeholder="location of y coordinate of victim"
-                            onChange={(e) => {
-                                setattacky(e.target.value);
-                            }}
+                            <input
+                                placeholder="location of y coordinate of victim"
+                                onChange={(e) => {
+                                    setattacky(e.target.value);
+                                }}
 
-                        />
+                            />
 
-                        <input
-                            placeholder="address of victim"
-                            onChange={(e) => {
-                                setattackaddress(e.target.value);
-                            }}
-                        />
+                            <input
+                                placeholder="address of victim"
+                                onChange={(e) => {
+                                    setattackaddress(e.target.value);
+                                }}
+                            />
+                        </div>
+                        {/* Defend div */}
+                        <div>
 
-                        <button
-                            onClick={() => {
-                                attack();
-                            }}
-                        >Attack</button>
+                            <Button
+                                onClick={() => {
+                                    attack();
+                                }}
+                            >Attack</Button>
 
-                        <button
-                            onClick={() => {
-                                defend();
-                            }}
-                        >
+                            <Button
+                                onClick={() => {
+                                    defend();
+                                }}
+                            >
 
-                            Defend</button>
+                                Defend</Button>
 
+                        </div>
                         <div style={{ border: "2px solid black" }}>
                             <h1>
                                 Your Stats
@@ -481,6 +528,41 @@ export default function Game() {
                     </div>
                 )
             }
+            <Button onClick={onOpen}>Open Modal</Button>
+            <Button ml={4} ref={finalRef}>
+                I'll receive focus on close
+            </Button>
+
+            <Modal
+                initialFocusRef={initialRef}
+                finalFocusRef={finalRef}
+                isOpen={isOpen}
+                onClose={onClose}
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Create your account</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody pb={6}>
+                        <FormControl>
+                            <FormLabel>First name</FormLabel>
+                            <Input ref={initialRef} placeholder='First name' />
+                        </FormControl>
+
+                        <FormControl mt={4}>
+                            <FormLabel>Last name</FormLabel>
+                            <Input placeholder='Last name' />
+                        </FormControl>
+                    </ModalBody>
+
+                    <ModalFooter>
+                        <Button colorScheme='blue' mr={3}>
+                            Save
+                        </Button>
+                        <Button onClick={onClose}>Cancel</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </div>
 
     )

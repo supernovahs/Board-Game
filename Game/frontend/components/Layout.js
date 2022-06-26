@@ -1,15 +1,15 @@
-import Header from "./Header";
+import dynamic from "next/dynamic";
 import Head from "next/head";
-import { useAccount, useConnect, useEnsName } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
 export default function Layout({ children }) {
-
+    const Header = dynamic(() => import("./Header"), {
+        ssr: false,
+    });
     return (
         <>
 
 
-            <div>
-                <Header style={{ margin: "10" }} />
+            <div >
+                <Header style={{}} />
                 <main >{children}
                 </main>
             </div>

@@ -4,7 +4,6 @@ import networks from "../utils/networks.json";
 import { useAccount, useConnect, useEnsName, useDisconnect } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 
-
 export default function Header() {
     const { data: account } = useAccount()
     const { connect } = useConnect({
@@ -22,14 +21,15 @@ export default function Header() {
                     {(account.address).substring(0, 6) + "..."}
                 </a>
             </div>) */}
-            <div className="p-5 mb-4 relative">
+            <div className="p-5 mb-4 ">
                 <p class="text-xl font-mono ">Connected to</p>
                 <a href={link} target="_blank">
                     {(account.address).substring(0, 6) + "..."}
                 </a>
+                <img src="/Footsteps.png" alt="" height="100" width="200" align="center" />
                 <button className="text-lg font-medium rounded-md bg-sky-300 hover:bg-violet-400 px-6 py-4 top-3 right-3 absolute" onClick={() => disconnect()}>Disconnect</button>
-            </div>
-        </div>
+            </div >
+        </div >
         )
     }
 

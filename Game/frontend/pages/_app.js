@@ -2,7 +2,11 @@ import Layout from '../components/Layout'
 import '../styles/globals.css'
 import networks from "../utils/networks.json";
 import { WagmiConfig, createClient, createStorage } from 'wagmi'
+import { ChakraProvider } from '@chakra-ui/react'
+import React from "react";
+import ReactDOM from "react-dom";
 let client;
+
 if (typeof window !== 'undefined') {
 
   client = createClient(
@@ -19,11 +23,14 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <div>
+
       <WagmiConfig client={client}>
 
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <ChakraProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ChakraProvider>
       </WagmiConfig>
 
 

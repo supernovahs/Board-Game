@@ -29,10 +29,28 @@ This game is powered by zero knowledge proofs.
    - wasm
 
  * Circuits:
-   - circom by iden3
+   - circom by [iden3](https://github.com/iden3/circom)
    
  * Contracts:
    - Solidity 
    - Foundry Tests(To be completed) 
+
+## Structure 
+
+* circuits :
+This folder consists of the 3 circom files that are used in the game :
+  - [Register.circom](https://github.com/supernovahs/Board-Game/blob/master/Game/circuits/Register/Register.circom)
+  - [Move.circom](https://github.com/supernovahs/Board-Game/blob/master/Game/circuits/Move/Move.circom)
+  - [Defend.circom](https://github.com/supernovahs/Board-Game/blob/master/Game/circuits/Defend/Defend.circom)
+
+* contracts : 
+This folder contains the core game contract and the verifier contracts generated using circom.
+  - [Game.sol](https://github.com/supernovahs/Board-Game/blob/master/Game/contracts/contracts/Game.sol)
+  - [Registerverifier.sol](https://github.com/supernovahs/Board-Game/blob/master/Game/contracts/contracts/Registerverifier.sol)
+  - [Moveverifier.sol](https://github.com/supernovahs/Board-Game/blob/master/Game/contracts/contracts/moveverifier.sol)
+  - [Defendverifier.sol](https://github.com/supernovahs/Board-Game/blob/master/Game/contracts/contracts/verifier.sol)
+
+
+
 
 

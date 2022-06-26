@@ -37,8 +37,9 @@ export default function Game() {
     const { connect } = useConnect({
         connector: new InjectedConnector(),
     })
-
-    let prov = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb");
+    // https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb
+    // https://api.s0.ps.hmny.io
+    let prov = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bbo");
     const { disconnect } = useDisconnect();
     const signer = useSigner();
     const provider = useProvider();
@@ -352,7 +353,7 @@ export default function Game() {
             }
         }
         attackerdetails();
-    }, [1000])
+    })
 
 
     return (

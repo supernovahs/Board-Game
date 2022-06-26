@@ -1,8 +1,10 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: Unlicensed
 pragma solidity ^0.8.4;
 
-// @notice: Interface of Verifying contract
+//// ============ Interfaces ==============
+
 interface Registerverifier{
+  // @notice Verifies zk proof when player registers
     function verifyProof(
             uint[2] memory a,
             uint[2][2] memory b,
@@ -11,7 +13,9 @@ interface Registerverifier{
         ) external view returns (bool);
 }
 
+
 interface Moveverifier{
+  // @notice Verifies zk proof when player moves
   function verifyProof(
             uint[2] memory ,
             uint[2][2] memory ,
@@ -21,6 +25,7 @@ interface Moveverifier{
 }
 
 interface DefenseVerifier{
+  // @notice Verifies zk proof when player defends
   function verifyProof(
             uint[2] memory a,
             uint[2][2] memory b,
@@ -29,25 +34,32 @@ interface DefenseVerifier{
         ) external view returns (bool);
 }
 
-abstract contract LoogiesContract {
-  function tokenURI(uint256 id) external virtual view returns (string memory);
-  function ownerOf(uint256 id) external virtual view returns (address);
-}
-
+/// @title  Footsteps contract 
+// @notice Core Game logic
 contract Footsteps {
 
+/// ============================= Storage =================================
+  address public immutable  registerverifier;
+  address public immutable moveverifier;
+  address public immutable verifierdefend;
 
+ 
+  address[] public activeplayers;
+  uint public playerid;
+
+  // =========== mapping ============
+
+  mapping(address =>uint) public Id;
   mapping(address=> Player) public players;
-  event register(address indexed player,bool registered);
-  event move(address indexed player, bool moved);
+  mapping(address =>Attack) public attacks;
 
-  LoogiesContract public loogiescontract;
-  address public registerverifier;
-  address public moveverifier;
-  address public verifierdefend;
+  // ===========  struct ============
 
-  struct Block{
-      uint position;  
+  struct Player{
+    address player;
+    uint health;
+    uint location;
+    uint zone;
   }
 
   struct Attack{
@@ -57,27 +69,30 @@ contract Footsteps {
     address attacker;
   }
 
-  mapping(address =>Attack) public attacks;
-
-  uint public constant height = 10;
-  uint public constant width = 10;
+  /// ===================Custom errors=========================== 
 
   error AlreadyRegistered(address player);
   error InvalidProof();
+  error DefendFirst();
+  error Dead();
+  error InvalidLocation();
+  error NoAttack();
+  error WrongGuess();
+  error Cheater();
 
-  Block[width][height] public Area;
 
-  struct Player{
-    address player;
-    uint health;
-    uint location;
-    uint zone;
-  }
+ // =======================events============================
 
-  mapping(address =>uint) public loogies;
+  event register(address indexed player,bool registered);
+  event move(address indexed player, bool moved);
 
-  address[] public activeplayers;
 
+/// ====================== Constructor ======================
+
+/// @notice  Creates Footsteps contract
+/// @param _registerverifier Address of register verifier
+/// @param _moveverifier Address of move verifier
+/// @param _defendverifier Address of defend verifier
   constructor (address _registerverifier,address _moveverifier,address _defendverifier) public payable{
     // loogiescontract = LoogiesContract(_loogiescontract);
     registerverifier = _registerverifier;
@@ -85,13 +100,17 @@ contract Footsteps {
     verifierdefend = _defendverifier;
   }
 
-  
-/* @notice: Register a player
 
-**/
+  /// ================ functions ===============
 
-  function Register(uint LoogieId,uint[2] memory a,uint[2][2] memory b,uint[2] memory c,uint[2] memory input) external {
-    require(Registerverifier(registerverifier).verifyProof(a,b,c,input) == true,"Invalid input");
+/// @notice Registers player to the game
+/// @param a ZK Proof of player's registration
+/// @param b ZK Proof of player's registration
+/// @param c ZK Proof of player's registration
+/// @param input input[0] = location hash , input[1] = zone
+
+  function Register(uint[2] memory a,uint[2][2] memory b,uint[2] memory c,uint[2] memory input) external {
+    if(!(Registerverifier(registerverifier).verifyProof(a,b,c,input) == true)) revert InvalidProof();
      if( players[msg.sender].player == msg.sender) revert AlreadyRegistered(msg.sender);
     Player memory  player = Player({
       player: msg.sender,
@@ -101,25 +120,41 @@ contract Footsteps {
     });
 
     players[msg.sender] = player;
-    loogies[msg.sender] = LoogieId;
+    Id[msg.sender] = playerid;
     activeplayers.push(msg.sender);
+    playerid++;
     emit register(msg.sender,true);
   } 
+
+
+/// @notice Moves player to a new location
+/// @param a ZK Proof of player's movement
+/// @param b ZK Proof of player's movement
+/// @param c ZK Proof of player's movement
+/// @param input input[0] =last  location hash , input[1] = New location hash,input[2] = new zone
+/// Q@dev input[0] should be equal to lash location hash to avoid cheating.
 
   function Move(uint[2] memory a,
             uint[2][2] memory b,
             uint[2] memory c,
             uint[3] memory input) external {
-    require(Moveverifier(moveverifier).verifyProof(a,b,c,input) == true,"Invalid input");
-    require(attacks[msg.sender].active == false,"Defend!!");
+    if(!(Moveverifier(moveverifier).verifyProof(a,b,c,input) == true)) revert InvalidProof();
+    if(attacks[msg.sender].active == true) revert DefendFirst();
     Player storage player = players[msg.sender];
-    require(player.health >=8 ,"Player is dead");
-    require(player.location == input[0],"Invalid location");
-    player.location = input[1];
-    player.zone = input[2];
-    player.health = player.health - 12;
-    emit move(msg.sender,true);
+    if(player.health <8) revert Dead();
+    if (player.location != input[0]) revert InvalidLocation();
+    player.location = input[1];/// New location hash is updated here
+    player.zone = input[2];/// zone is public to give hints to other players
+    player.health = player.health - 4;/// health decreases by 4 on every successful move
+    emit move(msg.sender,true);/// emits event to update local storage in front end 
   }
+
+
+/// @notice Attack player by guessing location
+/// @param player address of player to be attacked
+/// @param x xcoordinate of player to be attacked
+/// @param y ycoordinate of player to be attacked
+/// @dev updates the mapping Attack.active to true to victim to move. 
 
   function AttackPlayer(address player,uint x ,uint y) external {
   attacks[player] = Attack({
@@ -128,52 +163,52 @@ contract Footsteps {
     active: true,
     attacker: msg.sender
   });
-  players[msg.sender].health -=8;
-  
+  players[msg.sender].health -=8;/// Attacking  decreases health by 8pts
   }
+
+
+/// @notice Defending against an attack by proving location.
+/// @param a ZK Proof of player's defending
+/// @param b ZK Proof of player's defending
+/// @param c ZK Proof of player's defending
+/// @param input zk proof of input
+/// @dev input[0] current location of attacked player
+/// @dev input[1] xcoordinate of attacked player. Asserting this to be equal to guessed xcoordinate(by attacker) to prevent cheating by attacked player
+/// @dev input[2] ycoordinate of attacked player. Asserting this to be equal to guessed ycoordinate(by attacker) to prevent cheating by attacked player
 
   function Defend(uint[2] memory a,
             uint[2][2] memory b,
             uint[2] memory c,
             uint[3] memory input) external {
-    require(DefenseVerifier(verifierdefend).verifyProof(a,b,c,input) == true, "Invalid");
+    if(!(DefenseVerifier(verifierdefend).verifyProof(a,b,c,input) == true)) revert InvalidProof();
+    Player storage plr = players[msg.sender];
+    Attack storage att = attacks[msg.sender];
+    Player storage attackerplayer = players[att.attacker];
 
-    require(attacks[msg.sender].active == true,"No attack");
-    require(input[0] == players[msg.sender].location,"Wrong Guess");
-    require(input[1] == attacks[msg.sender].xguess,"Don't cheat");
-    require(input[2] == attacks[msg.sender].yguess,"Don't cheat");
+    if(att.active == false) revert NoAttack();
+    if(input[0] != plr.location) revert WrongGuess();
+    if(input[1] != att.xguess) revert Cheater();
+    if(input[2] != att.yguess) revert Cheater();
 
-    if(players[msg.sender].health > players[attacks[msg.sender].attacker].health){
-      players[msg.sender].health += ((players[attacks[msg.sender].attacker].health)/2);
-      players[attacks[msg.sender].attacker].health = (players[attacks[msg.sender].attacker].health)/2;
-      attacks[msg.sender].active = false;
-
+    if(plr.health > attackerplayer.health){
+      plr.health += ((attackerplayer.health)/2);
+      attackerplayer.health = (attackerplayer.health)/2;
+      att.active = false;
     }
-    else if(players[msg.sender].health == players[attacks[msg.sender].attacker].health) {
 
-      attacks[msg.sender].active = false;
-
+    else if(plr.health == attackerplayer.health) {
+      att.active = false;
     }
 
     else{
-
-      players[attacks[msg.sender].attacker].health += (players[msg.sender].health/2);
-      players[msg.sender].health -= (players[msg.sender].health /2);
-      attacks[msg.sender].active = false;
-
+      attackerplayer.health += (plr.health/2);
+      plr.health = (plr.health /2);
+      att.active = false;
     }
 
   }
 
-  // function ExitandRenterGame() external {
-  //   require(players[msg.sender].player != 0x0000,"Not Player");
-  //   players[msg.sender] = Player({
-  //     player: 0x0000,
-  //     health: 0,
-  //     location: 0,
-  //     zone: 0
-  //   })
-  // }
+  
 
   
 

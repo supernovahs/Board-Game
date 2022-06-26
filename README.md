@@ -20,4 +20,19 @@ This game is powered by zero knowledge proofs.
 
 ## Stack 
 
+ * Frontend :
+   - Nextjs
+   - Tailwindcss
+   - chakraUi
+   - snarkjs
+   - Canva
+   - wasm
+
+ * Circuits:
+   - circom by iden3
+   
+ * Contracts:
+   - Solidity 
+   - Foundry Tests(To be completed) 
+
 

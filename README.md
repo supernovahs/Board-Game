@@ -10,7 +10,7 @@ This game is powered by zero knowledge proofs.
 
 
 ## Contents
-* Stack Used
+* [Stack Used](https://github.com/supernovahs/Board-Game/tree/readme#stack)
 * Structure
   * circuits
   * frontend
@@ -19,3 +19,5 @@ This game is powered by zero knowledge proofs.
 
 
 ## Stack 
+
+

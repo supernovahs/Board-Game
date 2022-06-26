@@ -50,6 +50,18 @@ This folder contains the core game contract and the verifier contracts generated
   - [Moveverifier.sol](https://github.com/supernovahs/Board-Game/blob/master/Game/contracts/contracts/moveverifier.sol)
   - [Defendverifier.sol](https://github.com/supernovahs/Board-Game/blob/master/Game/contracts/contracts/verifier.sol)
 
+* frontend :
+  Frontend is created using next js with wagmi hooks to connect to wallet .
+  
+  Zk proofs are generated in front end using the following [files](https://github.com/supernovahs/Board-Game/tree/master/Game/frontend/public):
+  - Defend.wasm
+  - Defend_0001.zkey
+  - Move.wasm
+  - Move_0001.zkey
+  - Register.wasm
+  - Register_0001.zkey
+  - [Proofs.js](https://github.com/supernovahs/Board-Game/blob/master/Game/frontend/proofs/proof.js)
+  
 
 
 

@@ -11,10 +11,12 @@ This game is powered by zero knowledge proofs.
 
 ## Contents
 * [Stack Used](https://github.com/supernovahs/Board-Game/tree/readme#stack)
-* Structure
+* [Structure](https://github.com/supernovahs/Board-Game/tree/readme#structure)
   * circuits
   * frontend
   * contracts
+* [Running Locally]()
+* 
 
 
 
@@ -62,6 +64,34 @@ This folder contains the core game contract and the verifier contracts generated
   - Register_0001.zkey
   - [Proofs.js](https://github.com/supernovahs/Board-Game/blob/master/Game/frontend/proofs/proof.js)
   
+  
+## Configuring Locally
+If you to experience the process yourself, here's how you can use this repository locally in your computer. 
+
+### Deploying contracts 
+
+```
+cd Game
+cd contracts
+
+npx hardhat run scripts/deploy.js --network networkName
+```
+
+### Circuits
+
+```
+cd Game 
+cd circuits
+```
+
+### NextJs Frontend
+Deploy on localhost :3000
+
+```
+cd Game
+cd frontend
+yarn dev
+```
 
 
 

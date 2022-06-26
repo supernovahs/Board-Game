@@ -39,7 +39,7 @@ export default function Game() {
     })
     // https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb
     // https://api.s0.ps.hmny.io
-    let prov = new ethers.providers.JsonRpcProvider("https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bbo");
+    let prov = new ethers.providers.JsonRpcProvider("https://api.s0.ps.hmny.io");
     const { disconnect } = useDisconnect();
     const signer = useSigner();
     const provider = useProvider();
@@ -178,12 +178,7 @@ export default function Game() {
             }
         })
 
-
-
-
     }
-
-
 
     const register = async () => {
         const contracteventsregister = new ethers.Contract(contractAddress.Game, gameabi.abi, prov);

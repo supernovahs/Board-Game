@@ -3,7 +3,10 @@ const nextConfig = {
   reactStrictMode: false,
   webpack: function (config, options) {
     if (!options.isServer) {
-      config.resolve.fallback.fs = false;
+      config.resolve.fallback = {
+        fs: false,
+        events: require.resolve('events')
+      }
     }
     config.experiments = { asyncWebAssembly: true };
     return config;

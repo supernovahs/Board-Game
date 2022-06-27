@@ -682,7 +682,7 @@ export default function Game() {
             >
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>You've been attacked</ModalHeader>
+                    <ModalHeader>You&aposve been attacked</ModalHeader>
                     <ModalCloseButton />
                     <ModalFooter>
                         <Button onClick={async () => {

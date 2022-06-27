@@ -25,7 +25,7 @@ export default function Header() {
                     <h1 className="text-white text-3xl font-mono">Footsteps</h1>
                     <div className="flex items-center gap-5">
                         <p className="text-xl font-mono text-white ">Connected to</p>
-                        <a href={link} target="_blank" className="text-white">
+                        <a href={link} target="_blank" rel="noreferrer" className="text-white">
                             {account.address.substring(0, 6) + "..."}
                         </a>
                         <button

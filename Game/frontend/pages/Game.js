@@ -48,7 +48,7 @@ export default function Game() {
     // https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb
     // https://api.s0.ps.hmny.io
     let prov = new ethers.providers.JsonRpcProvider(
-        "https://kovan.infura.io/v3/cd8e0e041f694f99928dab7b1d79165c"
+        process.env.NEXT_PUBLIC_GOERLI
     );
     console.log(prov);
     const { disconnect } = useDisconnect();
@@ -180,8 +180,7 @@ export default function Game() {
         //   }
         // }
         setboard(boardupdate);
-        // console.log("board", board);
-    }, [moved, signer]);
+    }, [moved]);
 
     const contractlistener = new ethers.Contract(
         contractAddress.Game,
@@ -302,24 +301,31 @@ export default function Game() {
         let currenty = data.y;
 
         eventlistener(0);
+        console.log("address", address);
+        let attacks = await gamecontractread.attacks(address);
+        let s = attacks.active;
+        if (s == false) {
+            onOpen();
+        }
+        else {
 
-        let r = await gamecontractwrite.players(address);
-        let a = await r.location;
-        // console.log("a", a);
-        let res = await MoveProof(
-            currentx,
-            currenty,
-            Number(currentx) - 1,
-            currenty,
-            ran,
-            currentx
-        );
-        console.log("left move", res);
-        let location = await gamecontractwrite.players(address);
-        // console.log("location", location);
-        let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
-            gasLimit: 500000,
-        });
+            let r = await gamecontractwrite.players(address);
+            let a = await r.location;
+            // console.log("a", a);
+            let res = await MoveProof(
+                currentx,
+                currenty,
+                Number(currentx) - 1,
+                currenty,
+                ran,
+                currentx
+            );
+            console.log("left move", res);
+            let location = await gamecontractwrite.players(address);
+            let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
+                gasLimit: 500000,
+            });
+        }
     };
 
     const moveright = async () => {
@@ -433,6 +439,8 @@ export default function Game() {
         let a = await gamecontractwrite.attacks(address);
         console.log("a", a);
     };
+
+
     useEffect(() => {
         const getstats = async () => {
             if (address) {
@@ -620,13 +628,13 @@ export default function Game() {
                                     Attack
                                 </Button>
 
-                                <Button
+                                {/* <Button
                                     onClick={() => {
                                         defend();
                                     }}
                                 >
                                     Defend
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                         <div className="border-black border-l-2 p-10">
@@ -674,23 +682,18 @@ export default function Game() {
             >
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Create your account</ModalHeader>
+                    <ModalHeader>You've been attacked</ModalHeader>
                     <ModalCloseButton />
-                    <ModalBody pb={6}>
-                        <FormControl>
-                            <FormLabel>First name</FormLabel>
-                            <Input ref={initialRef} placeholder="First name" />
-                        </FormControl>
-
-                        <FormControl mt={4}>
-                            <FormLabel>Last name</FormLabel>
-                            <Input placeholder="Last name" />
-                        </FormControl>
-                    </ModalBody>
-
                     <ModalFooter>
-                        <Button colorScheme="blue" mr={3}>
-                            Save
+                        <Button onClick={async () => {
+
+                            defend();
+                            onClose();
+                        }}
+                            className=""
+                            colorScheme="blue"
+                            mr={3}>
+                            Defend
                         </Button>
                         <Button onClick={onClose}>Cancel</Button>
                     </ModalFooter>

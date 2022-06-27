@@ -35,12 +35,16 @@ module.exports = {
       accounts: [process.env.PRIVATE_KEY],
     },
     kovan: {
-      url: "https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb",
+      url: process.env.KOVAN,
       accounts: [process.env.PRIVATE_KEY],
     },
     devnet: {
       url: "https://api.s0.ps.hmny.io",
       accounts: [process.env.PRIVATE_KEY],
-    }
+    },
+    goerli: {
+      url: process.env.GOERLI,
+      accounts: [process.env.PRIVATE_KEY]
+    },
   },
 };

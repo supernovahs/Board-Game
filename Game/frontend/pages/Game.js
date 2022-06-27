@@ -479,12 +479,12 @@ export default function Game() {
             {gameover ? (
                 <div className="bg-gray-200 mt-20 flex flex-col flex-grow">
                     <div className="pt-2">
-                        <h1 class="text-center text-5xl my-10">Play Game!!</h1>
+                        <h1 className="text-center text-5xl my-10">Play Game!!</h1>
                     </div>
                     <div className="w-4/6 mx-auto border-4 border-black rounded hover:rounded-lg">
-                        <h2 class="text-2xl my-2 mx-2 text-center">Rules </h2>
+                        <h2 className="text-2xl my-2 mx-2 text-center">Rules </h2>
 
-                        <ul class="list-disc mx-8 my-5 pl-7">
+                        <ul className="list-disc mx-8 my-5 pl-7">
                             <li>
                                 {" "}
                                 <b> Welcome to footsteps</b>
@@ -499,7 +499,7 @@ export default function Game() {
                             </li>
                             <li>Health is reduced when you move .</li>
                             <li>
-                                Your aim is to guess another player's location using the
+                                Your aim is to guess another player&aposs location using the
                                 hints,if right, you get his half health
                             </li>
 
@@ -507,7 +507,7 @@ export default function Game() {
                             <li>Attacking costs 8pts health.</li>
                             <li>Moving costs 4pts</li>
                             <li>
-                                If you get attacked you can't move until you prove your
+                                If you get attacked you can&apost move until you prove your
                                 location.
                             </li>
                             <li>You lose if your health is less than 8 </li>
@@ -521,7 +521,7 @@ export default function Game() {
                     >
                         <div>
                             <input
-                                class="mx-8 my-6 p-2 border-2 border-black rounded-lg"
+                                className="mx-8 my-6 p-2 border-2 border-black rounded-lg"
                                 placeholder="x coordinate"
                                 onChange={(e) => {
                                     setXcoordinate(e.target.value);
@@ -531,7 +531,7 @@ export default function Game() {
                         </div>
                         <div>
                             <input
-                                class="mx-8 my-4 p-2 border-2 border-black rounded-lg"
+                                className="mx-8 my-4 p-2 border-2 border-black rounded-lg"
                                 placeholder="y coordinate"
                                 onChange={(e) => {
                                     setYcoordinate(e.target.value);
@@ -541,7 +541,7 @@ export default function Game() {
                         </div>
                         <div>
                             <button
-                                class="mx-8 my-4 py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
+                                className="mx-8 my-4 py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
                                 onClick={() => {
                                     register();
                                 }}
@@ -557,7 +557,7 @@ export default function Game() {
                         <div>
                             <div className="pt-10 flex justify-center items-center gap-5">
                                 <button
-                                    class="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
+                                    className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
                                     onClick={() => {
                                         moveleft();
                                     }}
@@ -566,7 +566,7 @@ export default function Game() {
                                 </button>
 
                                 <button
-                                    class="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
+                                    className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
                                     onClick={() => {
                                         moveright();
                                     }}
@@ -575,7 +575,7 @@ export default function Game() {
                                 </button>
 
                                 <button
-                                    class="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
+                                    className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
                                     onClick={() => {
                                         moveup();
                                     }}
@@ -584,7 +584,7 @@ export default function Game() {
                                 </button>
 
                                 <button
-                                    class="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
+                                    className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
                                     onClick={() => {
                                         movebottom();
                                     }}
@@ -595,7 +595,7 @@ export default function Game() {
                             {/* Attack div */}
                             <div className="pt-5 flex justify-center items-center gap-5">
                                 <input
-                                    class="mx-8 my-4 p-2 border-2 border-black rounded-lg"
+                                    className="mx-8 my-4 p-2 border-2 border-black rounded-lg"
                                     placeholder="x coordinate of victim "
                                     onChange={(e) => {
                                         setattackx(e.target.value);

@@ -13,6 +13,7 @@
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@rainbow-me/rainbowkit": "^0.3.0",
+    "@types/react": "^18.0.14",
     "dotenv": "^16.0.1",
     "ejs": "^3.1.8",
     "ethers": "^5.6.8",

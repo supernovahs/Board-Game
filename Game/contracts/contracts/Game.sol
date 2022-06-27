@@ -86,8 +86,9 @@ contract Footsteps {
 
  // =======================events============================
 
-  event register(address indexed player,bool registered);
-  event move(address indexed player, bool moved);
+  event register(address indexed player,bool indexed registered);
+  event move(address indexed player, bool indexed moved);
+  event dead(address indexed player,bool indexed deadornot);
 
 
 /// ====================== Constructor ======================
@@ -115,6 +116,7 @@ contract Footsteps {
       activeplayers.pop();
       Id[plr] =0;
       players[plr].alive =false;
+      emit dead(plr,true);
     }
   }
 
@@ -145,6 +147,7 @@ contract Footsteps {
     Id[msg.sender] = playerid;
 
     activeplayers.push(msg.sender);
+    require(activeplayers.length>0,"Not enough players");
     playerid++;
     emit register(msg.sender,true);
   } 

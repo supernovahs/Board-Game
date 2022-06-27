@@ -39,6 +39,7 @@ import { Button, ButtonGroup } from "@chakra-ui/react";
 // import { styles } from "../styles/globals.css";
 import { styles } from "../styles/Home.module.css";
 import Header from "../components/Header";
+import Renderplayer from "../components/Renderplayer";
 
 export default function Game() {
     const { data: account } = useAccount();
@@ -50,7 +51,6 @@ export default function Game() {
     let prov = new ethers.providers.JsonRpcProvider(
         process.env.NEXT_PUBLIC_GOERLI
     );
-    console.log(prov);
     const { disconnect } = useDisconnect();
     const signer = useSigner();
     const provider = useProvider();
@@ -104,9 +104,10 @@ export default function Game() {
         let yloc = parsedata?.y ? parsedata.y : 0;
         console.log("yloc", yloc);
         const boardupdate = (
-            <div className="grid grid-cols-10 w-1/2 mx-auto">
-                {Array.from(Array(height - 1), (_, i) =>
-                    Array.from(Array(width - 1), (_, j) => (
+            <div className="grid grid-cols-11 mx-5">
+                {[...Array(width)].map((_, i) => (<span key={i} className={`font-bold text-center`}>Zone {i}</span>))}
+                {Array.from(Array(height), (_, i) =>
+                    Array.from(Array(width), (_, j) => (
 
                         <div
                             className={`grid-item w-24 h-20 ${(i + j) % 2 ? "bg-gray-100" : "bg-gray-400"
@@ -115,9 +116,10 @@ export default function Game() {
 
                             <span>
 
-                                {j}
-                                {9 - i}
-                                {j === xloc && 9 - i === yloc ? (
+                                {j},
+                                {10 - i}
+                                {/* {console.log(`check  ${xloc == j} and ${yloc == 10 - i}`)} */}
+                                {j == xloc && 10 - i == yloc ? (
                                     <div className="absolute bottom-0 right-0 bg-red-600 w-12 h-12 rounded-full mr-2 mb-2"></div>
                                 ) : (
                                     ""
@@ -235,6 +237,19 @@ export default function Game() {
         });
     };
 
+
+
+    const [ev, setEv] = useState([]);
+    useEffect(() => {
+        const fetchActivePlayers = async () => {
+            let abi = ["event register(address player,bool deadornot)"]
+            const gamecontract = new ethers.Contract(contractAddress.Game, abi, prov);
+            const addresses = await gamecontract.queryFilter("register");
+            console.log("addresess", addresses);
+        }
+        fetchActivePlayers();
+    }, [])
+
     const register = async () => {
         const contracteventsregister = new ethers.Contract(
             contractAddress.Game,
@@ -243,7 +258,8 @@ export default function Game() {
         );
 
         contracteventsregister.on("register", (address, registered) => {
-            if (registered == true) {
+            setEv([...ev, `${address} joined`]);
+            if (registered == true && address == address) {
                 let playerdata = {
                     x: xcoordinate,
                     y: ycoordinate,
@@ -251,10 +267,8 @@ export default function Game() {
                 };
 
                 window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                // console.log("playerdata", playerdata);
                 setmoved(!moved);
                 let updated = 0;
-                // console.log("updated location in local storage!!!")
                 let newstore = window.localStorage.getItem("playerdata");
                 let newstoredata = JSON.parse(newstore);
 
@@ -265,7 +279,6 @@ export default function Game() {
                         newstoredata.y == ycoordinate &&
                         newstoredata.salt == random
                     ) {
-                        // console.log("registered successfully")
                         updated = 1;
                     }
                 }
@@ -289,7 +302,6 @@ export default function Game() {
             res[3],
             { gasLimit: 500000 }
         );
-        // console.log("result", result);
     };
 
     const moveleft = async () => {
@@ -398,7 +410,6 @@ export default function Game() {
         let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
             gasLimit: 2000000,
         });
-        // console.log("result", result);
     };
 
     const attack = async () => {
@@ -440,16 +451,21 @@ export default function Game() {
         console.log("a", a);
     };
 
-
     useEffect(() => {
         const getstats = async () => {
-            if (address) {
-                let data = await gamecontractread.players(address);
-                let health = data.health;
-                let playerzone = data.zone;
-                console.log("health", health);
-                setzone(playerzone);
-                sethealth(health);
+            try {
+
+                if (address) {
+                    let data = await gamecontractread.players(address);
+                    let health = data.health;
+                    let playerzone = data.zone;
+                    console.log("health", health);
+                    setzone(playerzone);
+                    sethealth(health);
+                }
+            }
+            catch (err) {
+                console.log("error on 458", err);
             }
         };
         getstats();
@@ -473,9 +489,73 @@ export default function Game() {
         attackerdetails();
     });
 
+    const useInterval = (callback, delay) => {
+        const savedCallback = React.useRef();
+
+        React.useEffect(() => {
+            savedCallback.current = callback;
+        }, [callback]);
+
+        React.useEffect(() => {
+            const tick = () => {
+                savedCallback.current();
+            }
+            if (delay !== null) {
+                let id = setInterval(tick, delay);
+                return () => clearInterval(id);
+            }
+        }, [delay]);
+    };
+
+
+    const [opponents, setOpponents] = useState([]);
+    useInterval(() => {
+        const getstats = async () => {
+            let a = await gamecontractwrite.activeplayers(0);
+            let data = await gamecontractwrite.players(a);
+            let b = Number(data.health);
+            let c = (data.zone);
+            console.log("health", b);
+            console.log("zone", c);
+            // setActivep(a);
+            setOpponents([{ health: b, zone: c, address: a }]);
+            console.log("a", a);
+        }
+        getstats();
+    }, 10000);
+    // useEffect(() => {
+    //     const getstats = async () => {
+    //         let a = await gamecontractwrite.activeplayers(0);
+    //         let data = await gamecontractwrite.players(a);
+    //         let b = Number(data.health);
+    //         let c = (data.zone);
+    //         console.log("health", b);
+    //         console.log("zone", c);
+    //         // setActivep(a);
+    //         setOpponents([...opponents, { health: b, zone: c, address: a }]);
+    //         console.log("a", a);
+    //     }
+    //     getstats();
+    // }, []);
+    // async function call() {
+    //     if (address) {
+
+
+    //         let a = await gamecontractwrite.activeplayers.length;
+    //         console.log("calling", a);
+
+
+    //     }
+    // }
+    // call();
+
+
+
+
     return (
         <div>
             <Header />
+
             {gameover ? (
                 <div className="bg-gray-200 mt-20 flex flex-col flex-grow">
                     <div className="pt-2">
@@ -648,27 +728,28 @@ export default function Game() {
                     </div>
 
                     <div
-                        //   style={{ transform: "scale(0.8,0.3)" }}
-                        className="my-10"
+                        className="my-10 flex"
                     >
-                        <div
-                        //   style={{
-                        //     color: "#111111",
-                        //     fontWeight: "bold",
-                        //     width: width * 64,
-                        //     height: height * 64,
-                        //   }}
-                        >
-                            <div
-                            // style={{
-                            //   opacity: 0.7,
-                            //   position: "absolute",
-                            //   left: length / 2 - 10,
-                            //   top: 0,
-                            // }}
-                            >
-                                {board}
-                            </div>
+                        <div className="w-4/5">
+                            {board}
+                        </div>
+                        <div className="border-black border-l-2 w-1/5 p-10">
+                            <h1 className="text-lg font-bold">EVENTS</h1>
+                            {opponents?.map((opponent) => {
+                                return (
+                                    <div className="mt-5">
+                                        <h2 className="py-1">
+                                            Address : {(opponent.address)}
+                                        </h2>
+                                        <h2 className="py-1">
+                                            Health : {Number(opponent.health)}
+                                        </h2>
+                                        <h2 className="py-1">
+                                            Zone : {Number(opponent.zone)}
+                                        </h2>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

@@ -3,10 +3,7 @@ const nextConfig = {
   reactStrictMode: false,
   webpack: function (config, options) {
     if (!options.isServer) {
-      config.resolve.fallback = {
-        fs: false,
-        events: require.resolve('events')
-      }
+      config.resolve.fallback.fs = false;
     }
     config.experiments = { asyncWebAssembly: true };
     return config;
@@ -15,7 +12,5 @@ const nextConfig = {
 
 module.exports = {
   nextConfig,
-  eslint: {
-    ignoreDuringBuilds: true,
-  }
+
 }

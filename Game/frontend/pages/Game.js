@@ -737,7 +737,7 @@ export default function Game() {
                             <h1 className="text-lg font-bold">EVENTS</h1>
                             {opponents?.map((opponent) => {
                                 return (
-                                    <div className="mt-5">
+                                    <div key={1} className="mt-5">
                                         <h2 className="py-1">
                                             Address : {(opponent.address)}
                                         </h2>

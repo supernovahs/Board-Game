@@ -49,7 +49,7 @@ export default function Game() {
     // https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb
     // https://api.s0.ps.hmny.io
     let prov = new ethers.providers.JsonRpcProvider(
-        process.env.NEXT_PUBLIC_GOERLI
+        "https://kovan.optimism.io"
     );
     const { disconnect } = useDisconnect();
     const signer = useSigner();
@@ -65,7 +65,7 @@ export default function Game() {
     const gamecontractread = useContract({
         addressOrName: contractAddress.Game,
         contractInterface: gameabi.abi,
-        signerOrProvider: provider,
+        signerOrProvider: prov,
     });
 
     // Constants
@@ -91,6 +91,29 @@ export default function Game() {
 
     const width = 11;
     const height = 11;
+
+    useEffect(() => {
+
+        const registerornot = async () => {
+            if (address) {
+
+                try {
+
+                    let a = await gamecontractread.Id(address);
+                    let isplayer = await a.toNumber();
+                    console.log("isplayer", isplayer);
+                    if (isplayer == 0) {
+                        setgameover(true);
+                    }
+                }
+                catch (err) {
+                    console.log("registerornot", err);
+                }
+            }
+
+        }
+        registerornot();
+    }, [address])
 
     const length = 90;
     const breadth = 90;

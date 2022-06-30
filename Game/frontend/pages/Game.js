@@ -87,8 +87,6 @@ export default function Game() {
     const initialRef = React.useRef(null);
     const finalRef = React.useRef(null);
 
-    console.log("addrress", address);
-
     const width = 11;
     const height = 11;
 
@@ -101,7 +99,6 @@ export default function Game() {
 
                     let a = await gamecontractread.Id(address);
                     let isplayer = await a.toNumber();
-                    console.log("isplayer", isplayer);
                     if (isplayer == 0) {
                         setgameover(true);
                     }
@@ -121,14 +118,11 @@ export default function Game() {
         console.log("rendering board");
         let localdata = window.localStorage.getItem("playerdata");
         let parsedata = JSON.parse(localdata);
-        console.log("parsedata", parsedata);
         let xloc = parsedata?.x ? parsedata.x : 0;
-        console.log("xloc", xloc);
         let yloc = parsedata?.y ? parsedata.y : 0;
-        console.log("yloc", yloc);
         const boardupdate = (
             <div className="grid grid-cols-11 mx-5">
-                {[...Array(width)].map((_, i) => (<span key={i} className={`font-bold text-center`}>Zone {i}</span>))}
+                {[...Array(width)].map((_, i) => (<span key={i} className={`font-bold text-center`}>{(i + 1) == 11 ? (<p>Dark Zone</p>) : (<p>Zone {i + 1}</p>)}</span>))}
                 {Array.from(Array(height), (_, i) =>
                     Array.from(Array(width), (_, j) => (
 
@@ -141,7 +135,6 @@ export default function Game() {
 
                                 {j},
                                 {10 - i}
-                                {/* {console.log(`check  ${xloc == j} and ${yloc == 10 - i}`)} */}
                                 {j == xloc && 10 - i == yloc ? (
                                     <div className="absolute bottom-0 right-0 bg-red-600 w-12 h-12 rounded-full mr-2 mb-2"></div>
                                 ) : (
@@ -154,56 +147,7 @@ export default function Game() {
 
             </div>
         );
-        // let boardupdate = [];
-        // for (let y = 0; y < height; y++) {
-        //   for (let x = width - 1; x >= 0; x--) {
-        //     let localdata = window.localStorage.getItem("playerdata");
-        //     let parsedata = JSON.parse(localdata);
-        //     let xloc = parsedata?.x ? parsedata.x : 0;
-        //     let yloc = parsedata?.y ? parsedata.y : 0;
-        //     let player = "";
-        //     if (xloc == x && yloc == y) {
-        //       player = (
-        //         <img
-        //           src="/chris-sharkot-ball.svg"
-        //           style={{
-        //             transform: "rotate(30deg) scale(1,3)",
-        //             width: 100,
-        //             height: 100,
-        //             marginLeft: -10,
-        //             marginTop: 0,
-        //           }}
-        //         />
-        //       );
-        //     }
-        //     boardupdate.push(
-        //       <div
-        //         style={{
-        //           width: length,
-        //           height: breadth,
-        //           padding: 1,
-        //           //   position: "absolute",
-        //           //   left: length * x,
-        //           //   top: breadth * (10 - y),
-        //         }}
-        //       >
-        //         <div
-        //           style={{
-        //             position: "relative",
-        //             height: "100%",
-        //             background: (x + y) % 2 ? " #FCF10A" : "#060606",
-        //           }}
-        //         >
-        //           {player ? (
-        //             player
-        //           ) : (
-        //             <span style={{ opacity: 0.4 }}>{"" + x + "," + y}</span>
-        //           )}
-        //         </div>
-        //       </div>
-        //     );
-        //   }
-        // }
+
         setboard(boardupdate);
     }, [moved]);
 
@@ -282,7 +226,7 @@ export default function Game() {
 
         contracteventsregister.on("register", (address, registered) => {
             setEv([...ev, `${address} joined`]);
-            if (registered == true && address == address) {
+            if (registered == true) {
                 let playerdata = {
                     x: xcoordinate,
                     y: ycoordinate,
@@ -329,24 +273,21 @@ export default function Game() {
 
     const moveleft = async () => {
         const pdata = window.localStorage.getItem("playerdata");
-        console.log("pdata", pdata);
         let data = JSON.parse(pdata);
         let ran = data.salt;
         let currentx = data.x;
         let currenty = data.y;
 
         eventlistener(0);
-        console.log("address", address);
         let attacks = await gamecontractread.attacks(address);
         let s = attacks.active;
-        if (s == false) {
+        if (s == true) {
             onOpen();
         }
         else {
 
             let r = await gamecontractwrite.players(address);
             let a = await r.location;
-            // console.log("a", a);
             let res = await MoveProof(
                 currentx,
                 currenty,
@@ -372,19 +313,27 @@ export default function Game() {
         let currenty = data.y;
 
         eventlistener(1);
+        let attacks = await gamecontractread.attacks(address);
+        let s = attacks.active;
+        if (s == true) {
+            onOpen();
+        }
+        else {
 
-        let res = await MoveProof(
-            currentx,
-            currenty,
-            Number(currentx) + 1,
-            currenty,
-            ran,
-            Number(currentx) + 2
-        );
-        console.log("right move", res);
-        let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
-            gasLimit: 500000,
-        });
+
+            let res = await MoveProof(
+                currentx,
+                currenty,
+                Number(currentx) + 1,
+                currenty,
+                ran,
+                Number(currentx) + 2
+            );
+            console.log("right move", res);
+            let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
+                gasLimit: 500000,
+            });
+        }
     };
 
     const moveup = async () => {
@@ -397,23 +346,31 @@ export default function Game() {
 
         eventlistener(2);
 
-        let res = await MoveProof(
-            currentx,
-            currenty,
-            currentx,
-            Number(currenty) + 1,
-            ran,
-            Number(currentx) + 1
-        );
-        console.log("Up move", res);
-        let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
-            gasLimit: 500000,
-        });
+        let attacks = await gamecontractread.attacks(address);
+        let s = attacks.active;
+        if (s == true) {
+            onOpen();
+        }
+        else {
+
+
+            let res = await MoveProof(
+                currentx,
+                currenty,
+                currentx,
+                Number(currenty) + 1,
+                ran,
+                Number(currentx) + 1
+            );
+            console.log("Up move", res);
+            let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
+                gasLimit: 500000,
+            });
+        }
     };
 
     const movebottom = async () => {
         const pdata = window.localStorage.getItem("playerdata");
-        // console.log("pdata", pdata);
         let data = JSON.parse(pdata);
         let ran = data.salt;
         let currentx = data.x;
@@ -421,18 +378,25 @@ export default function Game() {
 
         eventlistener(3);
 
-        let res = await MoveProof(
-            currentx,
-            currenty,
-            currentx,
-            Number(currenty) - 1,
-            ran,
-            Number(currentx) + 1
-        );
-        console.log("Bottom move", res);
-        let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
-            gasLimit: 2000000,
-        });
+        let attacks = await gamecontractread.attacks(address);
+        let s = attacks.active;
+        if (s == true) {
+            onOpen();
+        }
+        else {
+
+            let res = await MoveProof(
+                currentx,
+                currenty,
+                currentx,
+                Number(currenty) - 1,
+                ran,
+                Number(currentx) + 1
+            );
+            let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
+                gasLimit: 2000000,
+            });
+        }
     };
 
     const attack = async () => {
@@ -721,7 +685,6 @@ export default function Game() {
                                     }}
                                 />
                             </div>
-                            {/* Defend div */}
                             <div className="pt-5 flex justify-center items-center gap-5">
                                 <Button
                                     onClick={() => {
@@ -731,13 +694,6 @@ export default function Game() {
                                     Attack
                                 </Button>
 
-                                {/* <Button
-                                    onClick={() => {
-                                        defend();
-                                    }}
-                                >
-                                    Defend
-                                </Button> */}
                             </div>
                         </div>
                         <div className="border-black border-l-2 p-10">
@@ -786,7 +742,7 @@ export default function Game() {
             >
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>You&aposve been attacked</ModalHeader>
+                    <ModalHeader>You have been attacked</ModalHeader>
                     <ModalCloseButton />
                     <ModalFooter>
                         <Button onClick={async () => {

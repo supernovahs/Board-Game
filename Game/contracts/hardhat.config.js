@@ -42,6 +42,10 @@ module.exports = {
       url: "https://api.s0.ps.hmny.io",
       accounts: [process.env.PRIVATE_KEY],
     },
+    rinkeby: {
+      url: "https://rinkeby.infura.io/v3/cd8e0e041f694f99928dab7b1d79165c",
+      accounts: [process.env.PRIVATE_KEY],
+    }
     // goerli: {
     //   url: process.env.GOERLI,
     //   accounts: [process.env.PRIVATE_KEY]

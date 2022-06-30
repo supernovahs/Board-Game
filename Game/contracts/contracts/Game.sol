@@ -47,6 +47,7 @@ contract Footsteps {
   address[] public activeplayers;
   uint public playerid =1;
 
+
   // =========== mapping ============
 
   mapping(address =>uint) public Id;
@@ -249,6 +250,11 @@ contract Footsteps {
       exit(msg.sender);
     }
 
+  }
+
+/// @notice Returns the no. of active players 
+  function TotalPlayers() external view returns (uint){
+    return activeplayers.length;
   }
   
 }

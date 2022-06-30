@@ -493,48 +493,52 @@ export default function Game() {
             }
         }, [delay]);
     };
+    useInterval(() => {
 
+        const call = async () => {
+
+            let a = await gamecontractread.TotalPlayers();
+            for (let i = 0; i < Number(a); i++) {
+                console.log("calling", a);
+            }
+        }
+        call();
+    }, [200])
+
+    let arraddress = [];
 
     const [opponents, setOpponents] = useState([]);
     useInterval(() => {
         const getstats = async () => {
-            let a = await gamecontractwrite.activeplayers(0);
-            let data = await gamecontractwrite.players(a);
-            let b = Number(data.health);
-            let c = (data.zone);
-            console.log("health", b);
-            console.log("zone", c);
-            // setActivep(a);
-            setOpponents([{ health: b, zone: c, address: a }]);
-            console.log("a", a);
+            let a = await gamecontractread.TotalPlayers();
+            for (let i = 0; i < Number(a); i++) {
+                let data = await gamecontractread.activeplayers(i);
+                arraddress.push(data);
+            }
+            let playersdetails = [];
+            for (let i = 0; i < arraddress.length; i++) {
+                let data = await gamecontractread.players(arraddress[i]);
+                let health = data.health;
+                let playerzone = data.zone;
+                let playeraddress = arraddress[i];
+                let player = {
+                    health: health,
+                    zone: playerzone,
+                    address: playeraddress
+                };
+                if (playeraddress !== address) {
+
+                    playersdetails.push(player);
+                }
+            }
+            setOpponents(playersdetails);
+            console.log("opponents", opponents);
+
         }
         getstats();
-    }, 10000);
-    // useEffect(() => {
-    //     const getstats = async () => {
-    //         let a = await gamecontractwrite.activeplayers(0);
-    //         let data = await gamecontractwrite.players(a);
-    //         let b = Number(data.health);
-    //         let c = (data.zone);
-    //         console.log("health", b);
-    //         console.log("zone", c);
-    //         // setActivep(a);
-    //         setOpponents([...opponents, { health: b, zone: c, address: a }]);
-    //         console.log("a", a);
-    //     }
-    //     getstats();
-    // }, []);
-    // async function call() {
-    //     if (address) {
+    }, 200);
 
 
-    //         let a = await gamecontractwrite.activeplayers.length;
-    //         console.log("calling", a);
-
-
-    //     }
-    // }
-    // call();
 
 
 

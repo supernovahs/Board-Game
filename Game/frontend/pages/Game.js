@@ -112,8 +112,6 @@ export default function Game() {
         registerornot();
     }, [address])
 
-    const length = 90;
-    const breadth = 90;
     useEffect(() => {
         console.log("rendering board");
         let localdata = window.localStorage.getItem("playerdata");
@@ -156,6 +154,7 @@ export default function Game() {
         gameabi.abi,
         prov
     );
+
     const eventlistener = (direction) => {
         contractlistener.on("move", (address, moves) => {
             if (moves == true) {
@@ -206,17 +205,6 @@ export default function Game() {
 
 
 
-    const [ev, setEv] = useState([]);
-    useEffect(() => {
-        const fetchActivePlayers = async () => {
-            let abi = ["event register(address player,bool deadornot)"]
-            const gamecontract = new ethers.Contract(contractAddress.Game, abi, prov);
-            const addresses = await gamecontract.queryFilter("register");
-            console.log("addresess", addresses);
-        }
-        fetchActivePlayers();
-    }, [])
-
     const register = async () => {
         const contracteventsregister = new ethers.Contract(
             contractAddress.Game,
@@ -225,7 +213,6 @@ export default function Game() {
         );
 
         contracteventsregister.on("register", (address, registered) => {
-            setEv([...ev, `${address} joined`]);
             if (registered == true) {
                 let playerdata = {
                     x: xcoordinate,
@@ -352,7 +339,6 @@ export default function Game() {
             onOpen();
         }
         else {
-
 
             let res = await MoveProof(
                 currentx,
@@ -493,17 +479,17 @@ export default function Game() {
             }
         }, [delay]);
     };
+
     useInterval(() => {
 
         const call = async () => {
-
             let a = await gamecontractread.TotalPlayers();
             for (let i = 0; i < Number(a); i++) {
                 console.log("calling", a);
             }
         }
         call();
-    }, [200])
+    }, [500])
 
     let arraddress = [];
 
@@ -536,11 +522,7 @@ export default function Game() {
 
         }
         getstats();
-    }, 200);
-
-
-
-
+    }, 500);
 
 
     return (

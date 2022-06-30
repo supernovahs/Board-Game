@@ -49,7 +49,7 @@ export default function Game() {
     // https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb
     // https://api.s0.ps.hmny.io
     let prov = new ethers.providers.JsonRpcProvider(
-        "https://kovan.optimism.io"
+        "https://rinkeby.infura.io/v3/cd8e0e041f694f99928dab7b1d79165c"
     );
     const { disconnect } = useDisconnect();
     const signer = useSigner();
@@ -489,7 +489,7 @@ export default function Game() {
             }
         }
         call();
-    }, [500])
+    }, [1000])
 
     let arraddress = [];
 
@@ -522,7 +522,7 @@ export default function Game() {
 
         }
         getstats();
-    }, 500);
+    }, 1000);
 
 
     return (

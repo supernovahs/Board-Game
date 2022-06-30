@@ -42,9 +42,9 @@ module.exports = {
       url: "https://api.s0.ps.hmny.io",
       accounts: [process.env.PRIVATE_KEY],
     },
-    goerli: {
-      url: process.env.GOERLI,
-      accounts: [process.env.PRIVATE_KEY]
-    },
+    // goerli: {
+    //   url: process.env.GOERLI,
+    //   accounts: [process.env.PRIVATE_KEY]
+    // },
   },
 };

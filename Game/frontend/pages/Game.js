@@ -566,11 +566,11 @@ export default function Game() {
                             </li>
                             <li>
                                 Only a hint is given to other players as you move accross the
-                                board.
+                                board.(Your zone is public and can be seen by everyone)
                             </li>
                             <li>Health is reduced when you move .</li>
                             <li>
-                                Your aim is to guess another player&aposs location using the
+                                Your aim is to guess another player location using the
                                 hints,if right, you get his half health
                             </li>
 
@@ -578,7 +578,7 @@ export default function Game() {
                             <li>Attacking costs 8pts health.</li>
                             <li>Moving costs 4pts</li>
                             <li>
-                                If you get attacked you can&apost move until you prove your
+                                If you get attacked you cannot move until you prove your
                                 location.
                             </li>
                             <li>You lose if your health is less than 8 </li>

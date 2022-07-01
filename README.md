@@ -104,14 +104,42 @@ yarn dev
 ### Your Goal in the Game?
 Guess another player's location and attack , if successful your health increases, else vice versa. ERC20 token can be added for this.
 
-* Register as a player
+* Register as a player : 
 After connecting the  wallet, you land on the register page, you enter the coordinates of the location you want to land. You can choose between 0 to 10.
+ - Register Circuit
 
+```
+    signal  input a; User enter x coordinate
+    signal  input b; User enters Y coordinate
+    signal input salt; 
+    // User enters the zone he is entering, We will verify this below
+    signal input zone; User enters zone 
+    signal output c; This is the location hash that will be updated in contract
+```
+
+ Here above , the zone input is public , because we want it to be public. All other inputs are private.
 The  player enters the coordinate in front end , they are saved in local storage.
 
-* Move
+* Move : 
 Player can move across the board by clicking on the buttons. Your location is private . Only the location hash is public in the contract.
 Your actual location is in your localstorage.
+
+ - Move circuit
+
+```
+    signal input x1;  // User enter the previous location x coordinate
+    signal input y1;  // User enter the previous location y coordinate
+
+    signal input x2;  // User enter the new location x coordinate where he moves
+    signal input y2;  // User enter the new location y coordinate where he moves
+
+    signal input salt; // Salt must be the same that was used to register
+    signal input zone; // Zone will be public(Same as register)
+
+    signal output a;  // Old  location hash(This will be verified in contract )
+    signal output b;  // New location hash
+
+```
 
 ### If location is hashed, how will I guess another person's location?
 Well, the Board Game is divided in 10 zones, when every player moves, a public variable named zone is updated based on the location of the player. This is achieved by zk proofs.

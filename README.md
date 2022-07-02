@@ -15,8 +15,8 @@ This game is powered by zero knowledge proofs.
   * circuits
   * frontend
   * contracts
-* [Running Locally]()
-* 
+* [Running Locally]() 
+* [How to Play]()
 
 
 
@@ -32,6 +32,12 @@ This game is powered by zero knowledge proofs.
 
  * Circuits:
    - circom by [iden3](https://github.com/iden3/circom)
+   
+   Circuits are written in a lang called circom. This language helps prove expressions that are either:
+   - Constant values - Only a constant value is allowed. Ex: 4
+   - linear expressions - Expression where only addition is used Ex: 4+7+7
+   - Quadratic expressions - Expression where two linear expression are multiplied and one is added. Ex: a*b +c 
+   
    
  * Contracts:
    - Solidity 
@@ -93,6 +99,62 @@ cd frontend
 yarn dev
 ```
 
+## How to Play!
 
+### Your Goal in the Game?
+Guess another player's location and attack , if successful your health increases, else vice versa. ERC20 token can be added for this.
 
+* Register as a player : 
+After connecting the  wallet, you land on the register page, you enter the coordinates of the location you want to land. You can choose between 0 to 10.
+ - Register Circuit
 
+```
+    signal  input a; User enter x coordinate
+    signal  input b; User enters Y coordinate
+    signal input salt; 
+    // User enters the zone he is entering, We will verify this below
+    signal input zone; User enters zone 
+    signal output c; This is the location hash that will be updated in contract
+```
+
+ Here above , the zone input is public , because we want it to be public. All other inputs are private.
+The  player enters the coordinate in front end , they are saved in local storage.
+
+* Move : 
+Player can move across the board by clicking on the buttons. Your location is private . Only the location hash is public in the contract.
+Your actual location is in your localstorage.
+
+ - Move circuit
+
+```
+    signal input x1;  // User enter the previous location x coordinate
+    signal input y1;  // User enter the previous location y coordinate
+
+    signal input x2;  // User enter the new location x coordinate where he moves
+    signal input y2;  // User enter the new location y coordinate where he moves
+
+    signal input salt; // Salt must be the same that was used to register
+    signal input zone; // Zone will be public(Same as register)
+
+    signal output a;  // Old  location hash(This will be verified in contract )
+    signal output b;  // New location hash
+
+```
+
+### If location is hashed, how will I guess another person's location?
+Well, the Board Game is divided in 10 zones, when every player moves, a public variable named zone is updated based on the location of the player. This is achieved by zk proofs.
+
+* Attack 
+If you  think you correctly guessed another player's location , Guess his location and click on attack.
+
+* Defend 
+If you're attacked you cannot move until you prove that your location in response to the attack.
+
+## Importance of Salt  and some assumptions
+
+To prevent Brute force attacks(i.e by guessing location using hit and trial), the player along with the coordinates submit a salt(it's a random number ) to the circuit to prevent attacks.
+
+* Assumption
+
+Almost every zk application has an assumption that the user knows his salt . The salt is saved in his local storage. 
+If the player deleted his salt, he can not play the game. He will have to re register

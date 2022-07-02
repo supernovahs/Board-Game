@@ -28,7 +28,6 @@ import {
     ModalCloseButton,
 } from "@chakra-ui/react";
 import React from "react";
-import { Input } from "@chakra-ui/react";
 import {
     FormControl,
     FormLabel,
@@ -446,10 +445,12 @@ export default function Game() {
 
     useEffect(() => {
         if (Number(health) <= 8) {
+
             setgameover(true);
         }
     }, [health]);
 
+    console.log("healthhhh", Number(health))
     useEffect(() => {
         const attackerdetails = async () => {
             let a = await gamecontractwrite.attacks(address).active;
@@ -489,7 +490,7 @@ export default function Game() {
             }
         }
         call();
-    }, [500])
+    }, [10000])
 
     let arraddress = [];
 
@@ -522,7 +523,7 @@ export default function Game() {
 
         }
         getstats();
-    }, 500);
+    }, 10000);
 
 
     return (

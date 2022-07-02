@@ -231,6 +231,7 @@ contract Footsteps {
     if(input[1] != att.xguess) revert Cheater();
     if(input[2] != att.yguess) revert Cheater();
 
+  if(att.active == true){
     if(plr.health > attackerplayer.health){   /// If Defender's health >attacker , defender gains 20% of attacker's health
       plr.health += ((attackerplayer.health)/5);
       attackerplayer.health = ((attackerplayer.health)/5) * 4;
@@ -246,6 +247,8 @@ contract Footsteps {
       plr.health = (plr.health /2);
       att.active = false;
     }
+    
+  }
     if(plr.health <8){
       exit(msg.sender);
     }

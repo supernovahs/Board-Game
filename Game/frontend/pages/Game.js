@@ -423,7 +423,27 @@ export default function Game() {
         console.log("a", a);
     };
 
-    useEffect(() => {
+    const useInterval = (callback, delay) => {
+        const savedCallback = React.useRef();
+
+        React.useEffect(() => {
+            savedCallback.current = callback;
+        }, [callback]);
+
+        React.useEffect(() => {
+            const tick = () => {
+                savedCallback.current();
+            }
+            if (delay !== null) {
+                let id = setInterval(tick, delay);
+                return () => clearInterval(id);
+            }
+        }, [delay]);
+    };
+
+
+    useInterval(() => {
+
         const getstats = async () => {
             try {
 
@@ -441,10 +461,11 @@ export default function Game() {
             }
         };
         getstats();
-    }, [moved, address]);
+    }, [10000])
+
 
     useEffect(() => {
-        if (Number(health) <= 8) {
+        if (Number(health) < 8) {
 
             setgameover(true);
         }
@@ -463,23 +484,7 @@ export default function Game() {
         attackerdetails();
     });
 
-    const useInterval = (callback, delay) => {
-        const savedCallback = React.useRef();
 
-        React.useEffect(() => {
-            savedCallback.current = callback;
-        }, [callback]);
-
-        React.useEffect(() => {
-            const tick = () => {
-                savedCallback.current();
-            }
-            if (delay !== null) {
-                let id = setInterval(tick, delay);
-                return () => clearInterval(id);
-            }
-        }, [delay]);
-    };
 
     useInterval(() => {
 

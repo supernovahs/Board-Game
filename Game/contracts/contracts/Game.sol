@@ -90,6 +90,9 @@ contract Footsteps {
   event register(address indexed player,bool indexed registered);
   event move(address indexed player, bool indexed moved);
   event dead(address indexed player,bool indexed deadornot);
+  event attack(address indexed attacker,address indexed victim);
+  event defend(address indexed gained);
+
 
 
 /// ====================== Constructor ======================
@@ -202,6 +205,10 @@ contract Footsteps {
   if(players[msg.sender].health <8){  /// Handler: Health < 8 after attack condition. 
     exit(msg.sender);
   }
+  emit attack(msg.sender,player);
+
+  
+
 
   }
 
@@ -236,6 +243,7 @@ contract Footsteps {
       plr.health += ((attackerplayer.health)/5);
       attackerplayer.health = ((attackerplayer.health)/5) * 4;
       att.active = false;
+      emit defend(msg.sender);
     }
 
     else if(plr.health == attackerplayer.health) { /// If attacker health = defender health , attack failed
@@ -246,6 +254,7 @@ contract Footsteps {
       attackerplayer.health += (plr.health/2);
       plr.health = (plr.health /2);
       att.active = false;
+      emit defend(attackerplayer.player);
     }
     
   }

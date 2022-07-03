@@ -94,21 +94,19 @@ contract Footsteps {
   event defend(address indexed gained);
 
 
-
 /// ====================== Constructor ======================
 
 /// @notice  Creates Footsteps contract
 /// @param _registerverifier Address of register verifier
 /// @param _moveverifier Address of move verifier
 /// @param _defendverifier Address of defend verifier
+
   constructor (address _registerverifier,address _moveverifier,address _defendverifier) public payable{
     // loogiescontract = LoogiesContract(_loogiescontract);
     registerverifier = _registerverifier;
     moveverifier = _moveverifier;
     verifierdefend = _defendverifier;
   }
-
-
 
 
   /// ====================Internal Functions ===================
@@ -206,9 +204,6 @@ contract Footsteps {
     exit(msg.sender);
   }
   emit attack(msg.sender,player);
-
-  
-
 
   }
 

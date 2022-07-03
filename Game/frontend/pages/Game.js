@@ -39,6 +39,7 @@ import { Button, ButtonGroup } from "@chakra-ui/react";
 import { styles } from "../styles/Home.module.css";
 import Header from "../components/Header";
 import Renderplayer from "../components/Renderplayer";
+import EventCard from "../components/EventCard";
 
 export default function Game() {
     const { data: account } = useAccount();
@@ -612,91 +613,7 @@ export default function Game() {
                 </div>
             ) : (
                 <div className="bg-gray-200 mt-20 h-full flex flex-col flex-grow">
-                    <div className="flex justify-center border-black border-b-2 py-5">
-                        <div>
-                            <div className="pt-10 flex justify-center items-center gap-5">
-                                <button
-                                    className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
-                                    onClick={() => {
-                                        moveleft();
-                                    }}
-                                >
-                                    Move Left
-                                </button>
 
-                                <button
-                                    className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
-                                    onClick={() => {
-                                        moveright();
-                                    }}
-                                >
-                                    Move Right
-                                </button>
-
-                                <button
-                                    className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
-                                    onClick={() => {
-                                        moveup();
-                                    }}
-                                >
-                                    Move Up
-                                </button>
-
-                                <button
-                                    className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
-                                    onClick={() => {
-                                        movebottom();
-                                    }}
-                                >
-                                    Move Down
-                                </button>
-                            </div>
-                            {/* Attack div */}
-                            <div className="pt-5 flex justify-center items-center gap-5">
-                                <input
-                                    className="mx-8 my-4 p-2 border-2 border-black rounded-lg"
-                                    placeholder="x coordinate of victim "
-                                    onChange={(e) => {
-                                        setattackx(e.target.value);
-                                    }}
-                                />
-
-                                <input
-                                    className="mx-8 my-4 p-2 border-2 border-black rounded-lg"
-                                    placeholder="y coordinate of victim"
-                                    onChange={(e) => {
-                                        setattacky(e.target.value);
-                                    }}
-                                />
-
-                                <input
-                                    className="mx-8 my-4 p-2 border-2 border-black rounded-lg"
-                                    placeholder="address of victim"
-                                    onChange={(e) => {
-                                        setattackaddress(e.target.value);
-                                    }}
-                                />
-                            </div>
-                            <div className="pt-5 flex justify-center items-center gap-5">
-                                <Button
-                                    onClick={() => {
-                                        attack();
-                                    }}
-                                >
-                                    Attack
-                                </Button>
-
-                            </div>
-                        </div>
-                        <div className="border-black border-l-2 p-10">
-                            <h1 className="text-lg font-bold">Your Stats</h1>
-
-                            <div className="mt-5">
-                                {health && <h2 className="py-1">Health: {Number(health)}</h2>}
-                                {zone && <h2 className="py-1">Zone: {Number(zone)}</h2>}
-                            </div>
-                        </div>
-                    </div>
 
                     <div
                         className="my-10 flex"
@@ -704,23 +621,62 @@ export default function Game() {
                         <div className="w-4/5">
                             {board}
                         </div>
-                        <div className="border-black border-l-2 w-1/5 p-10">
-                            <h1 className="text-lg font-bold">EVENTS</h1>
-                            {opponents?.map((opponent) => {
-                                return (
-                                    <div key={1} className="mt-5">
-                                        <h2 className="py-1">
-                                            Address : {(opponent.address)}
-                                        </h2>
-                                        <h2 className="py-1">
-                                            Health : {Number(opponent.health)}
-                                        </h2>
-                                        <h2 className="py-1">
-                                            Zone : {Number(opponent.zone)}
-                                        </h2>
-                                    </div>
-                                );
-                            })}
+                        <div className="flex flex-col">
+
+                            <div className='p-5 border-2 border-black rounded-lg text-center '>
+                                <h1 className="text-lg font-bold">Your Stats</h1>
+
+                                <div className="mt-5">
+                                    {health && <h2 className="py-1">Health: {Number(health)}</h2>}
+                                    {zone && <h2 className="py-1">Zone: {Number(zone)}</h2>}
+                                </div>
+                            </div>
+
+                            <div>
+                                <h1 className="text-lg font-bold">ACTIONS</h1>
+                                <div className="pt-10 flex flex-col justify-center items-center gap-5">
+                                    <button
+                                        className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
+                                        onClick={() => {
+                                            moveleft();
+                                        }}
+                                    >
+                                        Move Left
+                                    </button>
+
+                                    <button
+                                        className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
+                                        onClick={() => {
+                                            moveright();
+                                        }}
+                                    >
+                                        Move Right
+                                    </button>
+
+                                    <button
+                                        className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
+                                        onClick={() => {
+                                            moveup();
+                                        }}
+                                    >
+                                        Move Up
+                                    </button>
+
+                                    <button
+                                        className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500"
+                                        onClick={() => {
+                                            movebottom();
+                                        }}
+                                    >
+                                        Move Down
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="mt-5">
+                                <h1 className="text-lg font-bold">EVENTS</h1>
+                                {opponents?.map((opponent) => <EventCard opponent={opponent} setattackx={setattackx} setattacky={setattacky} attackx={attackx} attacky={attacky} setattackaddress={setattackaddress} attack={attack} />)}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -35,9 +35,10 @@ export default function Game() {
     const { connect } = useConnect({
         connector: new InjectedConnector(),
     });
-
+    // https://kovan.optimism.io
+    //https://mainnet.optimism.io
     let prov = new ethers.providers.JsonRpcProvider(
-        " https://mainnet.optimism.io"
+        "https://mainnet.optimism.io"
     );
     const { disconnect } = useDisconnect();
     const signer = useSigner();
@@ -200,7 +201,11 @@ export default function Game() {
         );
 
         contracteventsregister.on("register", (address, registered) => {
-            if (registered == true) {
+            if (registered == true && address == address
+
+
+
+            ) {
                 let playerdata = {
                     x: xcoordinate,
                     y: ycoordinate,

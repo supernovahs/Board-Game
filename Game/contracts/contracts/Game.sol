@@ -102,7 +102,6 @@ contract Footsteps {
 /// @param _defendverifier Address of defend verifier
 
   constructor (address _registerverifier,address _moveverifier,address _defendverifier) public payable{
-    // loogiescontract = LoogiesContract(_loogiescontract);
     registerverifier = _registerverifier;
     moveverifier = _moveverifier;
     verifierdefend = _defendverifier;
@@ -143,7 +142,7 @@ contract Footsteps {
     if(!(Registerverifier(registerverifier).verifyProof(a,b,c,input) == true)) revert InvalidProof();
     Player memory plr = players[msg.sender];
      if( plr.player == msg.sender  && plr.alive==true) revert AlreadyRegistered(msg.sender);// Condition to check whether player is leaving even though its not dead.
-     /// Below is to reregister or register for first time. Code is same for both now .
+     /// Below is to reregister or register for first time. Code is same for both.
 
      Player memory  player = Player({
       player: msg.sender,
@@ -154,10 +153,9 @@ contract Footsteps {
     });
 
     players[msg.sender] = player;
-    Id[msg.sender] = playerid;
 
     activeplayers.push(msg.sender);
-    playerid++;
+    Id[msg.sender] = activeplayers.length;
     emit register(msg.sender,true);
   } 
 

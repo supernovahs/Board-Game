@@ -3,17 +3,28 @@ const { ethers } = require("hardhat");
 
 describe("Greeter", function () {
   it("Should return the new greeting once it's changed", async function () {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    await greeter.deployed();
+    const registerverifier = await hre.ethers.getContractFactory("RegisterVerifier");
+    const verifier = await registerverifier.deploy();
+    await verifier.deployed();
 
-    expect(await greeter.greet()).to.equal("Hello, world!");
+    console.log(" Register Verifier deployed to", verifier.address, "at", Date.now());
 
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
+    const moveverifier = await hre.ethers.getContractFactory("Move");
+    const verifymove = await moveverifier.deploy();
+    await verifymove.deployed();
 
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
+    console.log(" Move Verifier deployed to", verifymove.address, "at", Date.now());
 
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+    const defendverifier = await hre.ethers.getContractFactory("DefendVerify");
+    const verifydefend = await defendverifier.deploy();
+    await verifydefend.deployed();
+
+    console.log(" Defend Verifier deployed to", verifydefend.address, "at", Date.now());
+
+    const game = await hre.ethers.getContractFactory("Footsteps");
+    const gameInstance = await game.deploy(verifier.address, verifymove.address, verifydefend.address);
+    await gameInstance.deployed();
+
+    console.log("Game contract deployed to ", gameInstance.address, "at", Date.now());
   });
 });

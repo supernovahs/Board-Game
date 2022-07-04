@@ -1,5 +1,7 @@
 require("@nomiclabs/hardhat-waffle");
 require("dotenv").config();
+require("hardhat-gas-reporter");
+
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -19,10 +21,17 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: "0.8.4",
+  gasReporter: {
+    currency: 'ETH',
+    // gasPrice: 35,
+    enabled: true,
+    // gasPriceApi: 'https://ethgasstation.info/json/ethgasAPI.json',
+  },
+
   settings: {
     optimizer: {
       enabled: true,
-      runs: 200,
+      runs: 10000,
     },
   },
   networks: {
@@ -42,6 +51,10 @@ module.exports = {
       url: "https://api.s0.ps.hmny.io",
       accounts: [process.env.PRIVATE_KEY],
     },
+    optimism: {
+      url: "https://opt-mainnet.g.alchemy.com/v2/Xrob7KLorl_lMv7ThGjkbE7P7qShyW6v",
+      accounts: [process.env.PRIVATE_KEY],
+    }
     // goerli: {
     //   url: process.env.GOERLI,
     //   accounts: [process.env.PRIVATE_KEY]

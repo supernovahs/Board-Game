@@ -54,7 +54,7 @@ template RangeProof () {
 
     component zonerangeupper = LessThan(32);
     zonerangeupper.in[0] <== zone;
-    zonerangeupper.in[1] <== 11;
+    zonerangeupper.in[1] <== 12;
     zonerangeupper.out ===1 ;
 
 // Intermediate signals representing both the x coordinates of a zone 

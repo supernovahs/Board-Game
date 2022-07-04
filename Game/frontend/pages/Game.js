@@ -510,6 +510,10 @@ export default function Game() {
             let a = await gamecontractread.TotalPlayers();
             for (let i = 0; i < Number(a); i++) {
                 let data = await gamecontractread.activeplayers(i);
+                console.log("activeplayer", data);
+                let id = await gamecontractread.Id(data);
+                console.log("id", id);
+
                 arraddress.push(data);
             }
             let playersdetails = [];
@@ -536,7 +540,7 @@ export default function Game() {
     }, 10000);
 
     const Quit = async () => {
-        await gamecontractwrite.Quit();
+        await gamecontractwrite.Quit({ gasLimit: 2000000 });
     }
 
 
@@ -568,7 +572,8 @@ export default function Game() {
                             <li>Health is reduced when you move .</li>
                             <li>
                                 Your aim is to guess another player location using the
-                                hints,if right, you get his half health
+                                hints and if your health is greater than the attacked player, you get half of his health
+                                Else if the attacked player has greater health than you, he gets 20 % of your health.
                             </li>
 
                             <p>****</p>

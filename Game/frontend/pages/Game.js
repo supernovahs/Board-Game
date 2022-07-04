@@ -83,6 +83,7 @@ export default function Game() {
     const address = useAccount()?.data?.address;
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [attacked, setattacked] = useState(false);
+    const [alive, setalive] = useState(true);
 
     const initialRef = React.useRef(null);
     const finalRef = React.useRef(null);
@@ -455,6 +456,9 @@ export default function Game() {
                     console.log("health", health);
                     setzone(playerzone);
                     sethealth(health);
+                    let isalive = data.alive;
+                    console.log("alive", isalive);
+                    setalive(isalive);
                 }
             }
             catch (err) {
@@ -466,7 +470,7 @@ export default function Game() {
 
 
     useEffect(() => {
-        if (Number(health) < 8) {
+        if (Number(health) < 8 || (!alive)) {
 
             setgameover(true);
         }
@@ -530,6 +534,10 @@ export default function Game() {
         }
         getstats();
     }, 10000);
+
+    const Quit = async () => {
+        await gamecontractwrite.Quit();
+    }
 
 
     return (
@@ -622,7 +630,14 @@ export default function Game() {
                             {board}
                         </div>
                         <div className="flex flex-col">
-
+                            <button
+                                className="py-2 px-8 border-2 border-black rounded-lg bg-gray-400 hover:bg-gray-500 mb-2"
+                                onClick={() => {
+                                    Quit();
+                                }}
+                            >
+                                Quit Game
+                            </button>
                             <div className='p-5 border-2 border-black rounded-lg text-center '>
                                 <h1 className="text-lg font-bold">Your Stats</h1>
 

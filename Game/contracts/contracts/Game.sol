@@ -122,6 +122,15 @@ contract Footsteps {
     }
   }
 
+
+  function Quit() external {
+    if(msg.sender == players[msg.sender].player){
+      exit(msg.sender);
+    }
+  }
+
+
+
   /// ================ Public functions ===============
 
 /// @notice Registers player to the game
@@ -133,8 +142,7 @@ contract Footsteps {
   function Register(uint[2] memory a,uint[2][2] memory b,uint[2] memory c,uint[2] memory input) external {
     if(!(Registerverifier(registerverifier).verifyProof(a,b,c,input) == true)) revert InvalidProof();
     Player memory plr = players[msg.sender];
-     if( plr.player == msg.sender  && plr.health >=8) revert AlreadyRegistered(msg.sender);// Condition to check whether player is leaving even though its not dead.
-    if( plr.player == msg.sender  && plr.health <8) exit(msg.sender); /// IF health<8 , but player does not call move, attack or defend and directly calls register
+     if( plr.player == msg.sender  && plr.alive==true) revert AlreadyRegistered(msg.sender);// Condition to check whether player is leaving even though its not dead.
      /// Below is to reregister or register for first time. Code is same for both now .
 
      Player memory  player = Player({
@@ -149,7 +157,6 @@ contract Footsteps {
     Id[msg.sender] = playerid;
 
     activeplayers.push(msg.sender);
-    require(activeplayers.length>0,"Not enough players");
     playerid++;
     emit register(msg.sender,true);
   } 
@@ -169,7 +176,7 @@ contract Footsteps {
     if(attacks[msg.sender].active == true) revert DefendFirst();
 
     Player storage player = players[msg.sender];
-    if(player.health <8) revert Dead();
+    if(player.alive ==false) revert Dead();
     if (player.location != input[0]) revert InvalidLocation();
 
     player.location = input[1];/// New location hash is updated here
@@ -189,8 +196,8 @@ contract Footsteps {
 /// @dev updates the mapping Attack.active to true to victim to move. 
 
   function AttackPlayer(address player,uint x ,uint y) external {
-    if(players[msg.sender].health  <8) revert Dead();
-    if(players[player].health <8) revert ZombiesNotAllowed();// Victim already Dead.
+    if(players[msg.sender].alive  == false) revert Dead();
+    if(players[player].alive ==false) revert ZombiesNotAllowed();// Victim already Dead.
 
   attacks[player] = Attack({
     xguess: x,
@@ -255,6 +262,9 @@ contract Footsteps {
   }
     if(plr.health <8){
       exit(msg.sender);
+    }
+    if(attackerplayer.health <8){
+      exit(att.attacker);
     }
 
   }

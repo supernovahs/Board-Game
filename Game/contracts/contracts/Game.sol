@@ -118,7 +118,8 @@ contract Footsteps {
       Id[activeplayers[activeplayers.length -1]] = Id[plr];
       activeplayers.pop();
       Id[plr] =0;
-      players[plr].alive =false;
+      players[plr].alive = false;
+      attacks[plr].active  = false;
       emit dead(plr,true);
     }
   }

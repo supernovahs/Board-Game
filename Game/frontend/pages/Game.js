@@ -35,10 +35,9 @@ export default function Game() {
     const { connect } = useConnect({
         connector: new InjectedConnector(),
     });
-    // https://kovan.infura.io/v3/d21c9a0af06049d980fc5df2d149e4bb
-    // https://api.s0.ps.hmny.io
+
     let prov = new ethers.providers.JsonRpcProvider(
-        "https://kovan.optimism.io"
+        " https://mainnet.optimism.io"
     );
     const { disconnect } = useDisconnect();
     const signer = useSigner();
@@ -226,7 +225,9 @@ export default function Game() {
                 }
                 setgameover(false);
             }
+            contractlistener.removeAllListeners("register");
         });
+
         const random = ethers.BigNumber.from(
             ethers.utils.randomBytes(32)
         ).toString();

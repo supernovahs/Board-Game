@@ -237,11 +237,12 @@ contract Footsteps {
     Player storage attackerplayer = players[att.attacker];
 
     if(att.active == false) revert NoAttack();
+    att.active = false;
     if(input[0] != plr.location) revert WrongGuess();
     if(input[1] != att.xguess) revert Cheater();
     if(input[2] != att.yguess) revert Cheater();
 
-  if(att.active == true){
+  if(1==1){
     if(plr.health > attackerplayer.health){   /// If Defender's health >attacker , defender gains 20% of attacker's health
       plr.health += ((attackerplayer.health)/5);
       attackerplayer.health = ((attackerplayer.health)/5) * 4;

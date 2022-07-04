@@ -394,7 +394,7 @@ export default function Game() {
         );
         try {
             await gamecontractwrite.Defend(res[0], res[1], res[2], res[3], {
-                gasLimit: 400000,
+                gasLimit: 1000000,
             });
         } catch (err) {
             console.log("error", err);

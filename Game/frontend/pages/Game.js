@@ -121,7 +121,7 @@ export default function Game() {
         let yloc = parsedata?.y ? parsedata.y : 0;
         const boardupdate = (
             <div className="grid grid-cols-11 mx-5">
-                {[...Array(width)].map((_, i) => (<span key={i} className={`font-bold text-center`}>{(i + 1) == 11 ? (<p>Dark Zone</p>) : (<p>Zone {i + 1}</p>)}</span>))}
+                {[...Array(width)].map((_, i) => (<span key={i} className={`font-bold text-center`}>{(<p>Zone {i + 1}</p>)}</span>))}
                 {Array.from(Array(height), (_, i) =>
                     Array.from(Array(width), (_, j) => (
 

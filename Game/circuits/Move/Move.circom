@@ -58,7 +58,7 @@ template Move () {
 
     component zonerangeupper = LessThan(32);
     zonerangeupper.in[0] <== zone;
-    zonerangeupper.in[1] <== 11;
+    zonerangeupper.in[1] <== 12;
     zonerangeupper.out ===1;
 
     signal xleftside;

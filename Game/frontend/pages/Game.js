@@ -690,7 +690,7 @@ export default function Game() {
 
                             <div className="mt-5">
                                 <h1 className="text-lg font-bold">EVENTS</h1>
-                                {opponents?.map((opponent) => <EventCard opponent={opponent} setattackx={setattackx} setattacky={setattacky} attackx={attackx} attacky={attacky} setattackaddress={setattackaddress} attack={attack} />)}
+                                {opponents?.map((opponent, i) => <EventCard key={i} opponent={opponent} setattackx={setattackx} setattacky={setattacky} attackx={attackx} attacky={attacky} setattackaddress={setattackaddress} attack={attack} />)}
                             </div>
                         </div>
                     </div>

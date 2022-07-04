@@ -1,5 +1,8 @@
 const ethers = require("hardhat");
 
+
+
+
 const deploy = async () => {
 
     const registerverifier = await hre.ethers.getContractFactory("RegisterVerifier");
@@ -38,5 +41,9 @@ const run = async () => {
     }
 
 }
+
+
+
+
 
 run();

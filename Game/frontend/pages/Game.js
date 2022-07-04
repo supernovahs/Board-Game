@@ -2,10 +2,7 @@ import { useState, useEffect } from "react";
 const ethers = require("ethers");
 import {
     useContract,
-    useProvider,
     useSigner,
-    useContractEvent,
-    useNetwork,
     useDisconnect,
 } from "wagmi";
 import { switchNetwork } from "../utils/switchnetworks";
@@ -28,17 +25,9 @@ import {
     ModalCloseButton,
 } from "@chakra-ui/react";
 import React from "react";
-import {
-    FormControl,
-    FormLabel,
-    FormErrorMessage,
-    FormHelperText,
-} from "@chakra-ui/react";
-import { Button, ButtonGroup } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 // import { styles } from "../styles/globals.css";
-import { styles } from "../styles/Home.module.css";
 import Header from "../components/Header";
-import Renderplayer from "../components/Renderplayer";
 import EventCard from "../components/EventCard";
 
 export default function Game() {
@@ -53,7 +42,7 @@ export default function Game() {
     );
     const { disconnect } = useDisconnect();
     const signer = useSigner();
-    const provider = useProvider();
+    // const provider = useProvider();
 
     const gamecontractwrite = useContract({
         addressOrName: contractAddress.Game,
@@ -187,7 +176,6 @@ export default function Game() {
                         salt: parsedata.salt,
                     };
                     window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                    console.log("playerdata", playerdata);
                     setmoved(!moved);
                 } else if (direction == 3) {
                     let playerdata = {
@@ -196,7 +184,6 @@ export default function Game() {
                         salt: parsedata.salt,
                     };
                     window.localStorage.setItem("playerdata", JSON.stringify(playerdata));
-                    console.log("playerdata", playerdata);
                     setmoved(!moved);
                 }
                 contractlistener.removeAllListeners("move");
@@ -284,7 +271,6 @@ export default function Game() {
                 ran,
                 currentx
             );
-            console.log("left move", res);
             let location = await gamecontractwrite.players(address);
             let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
                 gasLimit: 500000,
@@ -294,7 +280,6 @@ export default function Game() {
 
     const moveright = async () => {
         const pdata = window.localStorage.getItem("playerdata");
-        // console.log("pdata", pdata);
         let data = JSON.parse(pdata);
         let ran = data.salt;
         let currentx = data.x;
@@ -326,7 +311,6 @@ export default function Game() {
 
     const moveup = async () => {
         const pdata = window.localStorage.getItem("playerdata");
-        // console.log("pdata", pdata);
         let data = JSON.parse(pdata);
         let ran = data.salt;
         let currentx = data.x;
@@ -349,7 +333,6 @@ export default function Game() {
                 ran,
                 Number(currentx) + 1
             );
-            console.log("Up move", res);
             let result = await gamecontractwrite.Move(res[0], res[1], res[2], res[3], {
                 gasLimit: 500000,
             });
@@ -398,12 +381,7 @@ export default function Game() {
     const defend = async () => {
         let xcoordinateguess = await gamecontractwrite.attacks(address);
         let ycoordinateguess = await gamecontractwrite.attacks(address);
-        console.log(
-            "xguess",
-            Number(xcoordinateguess.xguess),
-            "yguess",
-            Number(ycoordinateguess.yguess)
-        );
+
         const pdata = window.localStorage.getItem("playerdata");
         console.log("pdata", pdata);
         let data = JSON.parse(pdata);
@@ -413,7 +391,6 @@ export default function Game() {
             Number(ycoordinateguess.yguess),
             ran
         );
-        console.log(" Defend result", res);
         try {
             await gamecontractwrite.Defend(res[0], res[1], res[2], res[3], {
                 gasLimit: 400000,
@@ -421,8 +398,7 @@ export default function Game() {
         } catch (err) {
             console.log("error", err);
         }
-        let a = await gamecontractwrite.attacks(address);
-        console.log("a", a);
+
     };
 
     const useInterval = (callback, delay) => {
@@ -453,11 +429,9 @@ export default function Game() {
                     let data = await gamecontractread.players(address);
                     let health = data.health;
                     let playerzone = data.zone;
-                    console.log("health", health);
                     setzone(playerzone);
                     sethealth(health);
                     let isalive = data.alive;
-                    console.log("alive", isalive);
                     setalive(isalive);
                 }
             }
@@ -476,31 +450,17 @@ export default function Game() {
         }
     }, [health]);
 
-    console.log("healthhhh", Number(health))
     useEffect(() => {
         const attackerdetails = async () => {
             let a = await gamecontractwrite.attacks(address).active;
             setattacked(a);
             if (attacked) {
-                console.log("attacked");
                 onOpen();
             }
         };
         attackerdetails();
     });
 
-
-
-    useInterval(() => {
-
-        const call = async () => {
-            let a = await gamecontractread.TotalPlayers();
-            for (let i = 0; i < Number(a); i++) {
-                console.log("calling", a);
-            }
-        }
-        call();
-    }, [10000])
 
     let arraddress = [];
 
@@ -510,7 +470,6 @@ export default function Game() {
             let a = await gamecontractread.TotalPlayers();
             for (let i = 0; i < Number(a); i++) {
                 let data = await gamecontractread.activeplayers(i);
-                console.log("activeplayer", data);
                 let id = await gamecontractread.Id(data);
                 console.log("id", id);
 
@@ -533,7 +492,6 @@ export default function Game() {
                 }
             }
             setOpponents(playersdetails);
-            console.log("opponents", opponents);
 
         }
         getstats();
@@ -554,7 +512,7 @@ export default function Game() {
                         <h1 className="text-center text-5xl my-10">Play Game!!</h1>
                     </div>
                     <div className="w-4/6 mx-auto border-4 border-black rounded hover:rounded-lg">
-                        <h2 className="text-2xl my-2 mx-2 text-center">Rules </h2>
+                        <h2 className="text-2xl my-2 mx-2 text-center ">Rules </h2>
 
                         <ul className="list-disc mx-8 my-5 pl-7">
                             <li>

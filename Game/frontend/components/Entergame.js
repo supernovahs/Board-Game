@@ -2,8 +2,7 @@ import Link from "next/link";
 
 export default function Entergame() {
     return (
-        // ToDo : Add a bg image here
-        // <div className="bg-landing flex flex-wrap absolute">
+
         <div className="flex absolute rounded-md justify-center items-center bg-gray-400 cursor-pointer px-10 py-3 ">
             <Link href="/Game">
                 <div

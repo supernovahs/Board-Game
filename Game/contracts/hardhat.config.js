@@ -55,9 +55,6 @@ module.exports = {
       url: "https://opt-mainnet.g.alchemy.com/v2/Xrob7KLorl_lMv7ThGjkbE7P7qShyW6v",
       accounts: [process.env.PRIVATE_KEY],
     }
-    // goerli: {
-    //   url: process.env.GOERLI,
-    //   accounts: [process.env.PRIVATE_KEY]
-    // },
+
   },
 };

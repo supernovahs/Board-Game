@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: Unlicensed
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
 //// ============ Interfaces ==============
@@ -35,7 +35,8 @@ interface DefenseVerifier{
 }
 
 /// @title  Footsteps contract 
-// @notice Core Game logic
+/// @author Supernovahs.eth  <Twitter: @harshit16024263 > 
+// @notice Game logic for Board Game Footsteps
 contract Footsteps {
 
 /// ============================= Storage =================================
@@ -45,7 +46,6 @@ contract Footsteps {
 
  
   address[] public activeplayers;
-  uint public playerid =1;
 
 
   // =========== mapping ============
@@ -110,8 +110,10 @@ contract Footsteps {
 
   /// ====================Internal Functions ===================
 
+/// @notice : Exit the Game 
   function exit(address plr) internal {
     if(players[plr].alive ==true){
+    
     activeplayers[Id[plr] -1 ] = activeplayers[activeplayers.length -1];
       Id[activeplayers[activeplayers.length -1]] = Id[plr];
       activeplayers.pop();
@@ -121,7 +123,7 @@ contract Footsteps {
     }
   }
 
-
+/// Exit the game
   function Quit() external {
     if(msg.sender == players[msg.sender].player){
       exit(msg.sender);
@@ -136,7 +138,7 @@ contract Footsteps {
 /// @param a ZK Proof of player's registration
 /// @param b ZK Proof of player's registration
 /// @param c ZK Proof of player's registration
-/// @param input input[0] = location hash , input[1] = zone
+/// @param input input[0] = location-hash , input[1] = zone
 
   function Register(uint[2] memory a,uint[2][2] memory b,uint[2] memory c,uint[2] memory input) external {
     if(!(Registerverifier(registerverifier).verifyProof(a,b,c,input) == true)) revert InvalidProof();
@@ -191,7 +193,7 @@ contract Footsteps {
 /// @param player address of player to be attacked
 /// @param x xcoordinate of player to be attacked
 /// @param y ycoordinate of player to be attacked
-/// @dev updates the mapping Attack.active to true to victim to move. 
+/// @dev updates the mapping Attack.active to true to stop the victim to move. 
 
   function AttackPlayer(address player,uint x ,uint y) external {
     if(players[msg.sender].alive  == false) revert Dead();
@@ -214,9 +216,9 @@ contract Footsteps {
 
 
 /// @notice Defending against an attack by proving location.
-/// @param a ZK Proof of player's defending
-/// @param b ZK Proof of player's defending
-/// @param c ZK Proof of player's defending
+/// @param a ZK Proof of player who is  defending
+/// @param b ZK Proof of player who is  defending
+/// @param c ZK Proof of player who is  defending
 /// @param input zk proof of input
 /// @dev input[0] current location of attacked player
 /// @dev input[1] xcoordinate of attacked player. Asserting this to be equal to guessed xcoordinate(by attacker) to prevent cheating by attacked player

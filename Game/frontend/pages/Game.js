@@ -147,7 +147,7 @@ export default function Game() {
 
     const eventlistener = (direction) => {
         contractlistener.on("move", (address, moves) => {
-            if (moves == true) {
+            if (moves == true && address == address) {
                 const data = window.localStorage.getItem("playerdata");
                 const parsedata = JSON.parse(data);
 
